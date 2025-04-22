@@ -1,8 +1,8 @@
-**Challenge - Projeto Codi Cash**
+# **Challenge - Projeto Codi Cash**
 
 **Período do Challenge:** 29/04/2025 a 29/07/2025  
-**Projeto:** Desenvolvimento do FRONTEND do sistema "Codi Cash"  
-**Objetivo:** Criar a interface completa e funcional de um software de gestão financeira voltado para as unidades da Codi Academy, considerando responsividade, usabilidade e integração futura com APIs.
+**Projeto:** Sistema "Codi Cash"  
+**Objetivo:** Criar a interface (Front-end) completa e funcional de um software de gestão financeira voltado para as unidades da Codi Academy, considerando responsividade, usabilidade e integração futura com APIs.
 
 ---
 
