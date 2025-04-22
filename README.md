@@ -1,6 +1,6 @@
 # **Challenge - Projeto Codi Cash**
 
-**Período do Challenge:** 29/04/2025 a 29/07/2025  
+**Período do Challenge:** 29/04/2025 a 11/07/2025  
 **Projeto:** Sistema "Codi Cash"  
 **Objetivo:** Criar a interface (Front-end) completa e funcional de um software de gestão financeira voltado para as unidades da Codi Academy, considerando responsividade, usabilidade e integração futura com APIs.
 
@@ -41,7 +41,7 @@ Vocês serão responsáveis por desenvolver **apenas o frontend** da aplicação
 - Lista de vendas cadastradas com filtros por período e tipo de curso
 
 ### 3.3. Módulo de Gastos
-- Cadastro de despesas fixas (luz, água, aluguel, internet)
+- Cadastro de despesas fixas (luz, água, aluguel, internet, folha de pagamento, vale transporte, imposto sobre folha)
 - Cadastro de despesas variáveis (manutenção, suprimentos, etc.)
 - Edição e exclusão de lançamentos
 - Visualização de histórico de gastos
