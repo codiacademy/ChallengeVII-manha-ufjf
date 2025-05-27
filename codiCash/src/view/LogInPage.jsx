@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import cclogo from "../img/cclogo.png";
-import DashboardPage from "./DashboardPage";
-// import { setPage } from "../App";
+import { useNavigate } from "react-router-dom";
 
-const LogInPage = ({ setPage }) => {
+const LogInPage = () => {
+  const navigate = useNavigate();
+
   const LogIn = () => {
     const user = document.getElementById("username").value;
     const password = document.getElementById("password").value;
@@ -12,7 +13,7 @@ const LogInPage = ({ setPage }) => {
     if (user === "admin" && password === "admin") {
       localStorage.setItem("loggedInUser", user);
       alert("Login bem sucedido!");
-      setPage("dashboard");
+      navigate("/dashboard");
     } else {
       alert("Usuário ou senha incorretos!");
     }
