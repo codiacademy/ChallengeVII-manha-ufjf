@@ -3,8 +3,6 @@ import cclogo from "../img/cclogo.png";
 import { useNavigate } from "react-router-dom";
 
 const LogInPage = () => {
-  const navigate = useNavigate();
-
   const LogIn = () => {
     const user = document.getElementById("username").value;
     const password = document.getElementById("password").value;
@@ -13,11 +11,14 @@ const LogInPage = () => {
     if (user === "admin" && password === "admin") {
       localStorage.setItem("loggedInUser", user);
       alert("Login bem sucedido!");
+      // Passar uma função retornando true para o useNavigate
       navigate("/dashboard");
     } else {
       alert("Usuário ou senha incorretos!");
     }
   };
+
+  const navigate = useNavigate();
 
   return (
     <div class="bg-[#580581] h-screen flex flex-col items-center justify-center">

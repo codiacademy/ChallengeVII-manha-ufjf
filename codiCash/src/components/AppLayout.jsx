@@ -4,7 +4,7 @@ import Header from "../components/Header";
 
 const AppLayout = () => {
   return (
-    <div className="fixed top-0 left-0 w-auto h-screen z-50">
+    <div>
       <Header />
       <SideBar />
     </div>
