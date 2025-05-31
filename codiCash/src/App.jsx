@@ -5,17 +5,20 @@ import DashboardPage from "./view/DashboardPage";
 import SalesPage from "./view/SalesPage";
 import ExpensesPage from "./view/ExpensesPage";
 import ReportsPage from "./view/ReportsPage";
+import AppLayout from "./components/AppLayout";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LogInPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/sales" element={<SalesPage />} />
-        <Route path="/expenses" element={<ExpensesPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="*" element={<h1>Erro 404 - Uai</h1>} />
+        <Route path="/" element={<AppLayout />}>
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="sales" element={<SalesPage />} />
+          <Route path="expenses" element={<ExpensesPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="*" element={<h1>Erro 404 - Uai</h1>} />
+        </Route>
       </Routes>
     </Router>
   );

@@ -18,7 +18,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-[#a243d2] w-screen flex">
+    <header className="bg-[#a243d2] w-full flex">
       <img src={cclogo} alt="Logo" className="w-24 h-24 mx-0 left-0" />
       <div className="flex justify-end items-center w-full mr-10">
         <button onClick={() => handleThemeChange()} className="pr-10">

@@ -6,16 +6,13 @@ import AppLayout from "../components/AppLayout";
 
 const DashboardPage = () => {
   return (
-    <div>
-      <AppLayout />
-    <div className="bg-[#ffffff] h-screen flex flex-col items-center justify-center">
+    <div className="bg-[#ffffff] flex flex-col items-center justify-center h-full ">
       <div className="flex flex-col items-center justify-center h-auto w-100 bg-[#a243d2] rounded-lg shadow-lg">
         <h1 className="text-white text-3xl font-bold mb-4">Dashboard</h1>
         <p className="text-white text-lg">
           Bem-vindo ao seu painel de controle!
         </p>
       </div>
-    </div>
     </div>
   );
 };
