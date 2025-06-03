@@ -18,6 +18,7 @@ const Header = () => {
   const handleProfileClick = () => {
     const userName = loggedInUser || "Usuário";
     alert(`Perfil de ${userName} clicado!`);
+
   };
 
   return (
