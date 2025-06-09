@@ -2,6 +2,7 @@ import React from "react";
 import cclogo from "../img/cclogo.png";
 import themeIcon from "../img/theme-icon.png";
 import notificationIcon from "../img/notification-icon.png";
+import Modal from "./Modal";
 
 const Header = () => {
   const loggedInUser = localStorage.getItem("loggedInUser");
@@ -16,9 +17,7 @@ const Header = () => {
     console.log("Notifications clicked");
   };
   const handleProfileClick = () => {
-    const userName = loggedInUser || "Usuário";
-    alert(`Perfil de ${userName} clicado!`);
-
+    
   };
 
   return (

@@ -13,7 +13,6 @@ const LogInPage = () => {
       const users = await response.json();
       if (users.length > 0 && users[0].senha === senha) {
         localStorage.setItem("loggedInUser", users[0].nome);
-        alert("Login bem-sucedido!");
         navigate("/dashboard");
       } else {
         alert("Usuário ou senha incorretos. Tente novamente.");
@@ -26,7 +25,6 @@ const LogInPage = () => {
 
   const handleForgotPassword = () => {
     alert("Redirecionando para a página de recuperação de senha...");
-    // Aqui você pode redirecionar para a página de recuperação de senha se desejar
   };
 
   return (

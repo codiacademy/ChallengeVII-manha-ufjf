@@ -9,7 +9,7 @@ const SideBar = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="bg-[#ffffff] text-[#a243d2] h-screen w-22 flex flex-col hover:w-45 transition-all duration-300 border-r-2 border-[#a243d2]">
+    <nav className="bg-[#ffffff] text-[#a243d2] h-screen w-22 hover:w-45 transition-all duration-300 fixed z-10 border-r-2 border-[#a243d2]">
       <ul className="w-full">
         <li className="flex items-center p-4 hover:bg-[#a243d2] hover:text-white cursor-pointer" onClick={() => navigate("/dashboard")}>
             <img src={dashboardIcon} alt="Dashboard" className="w-12 h-12 mr-2"/>

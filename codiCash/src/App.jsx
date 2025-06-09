@@ -1,24 +1,16 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LogInPage from "./view/LogInPage";
-import DashboardPage from "./view/DashboardPage";
-import SalesPage from "./view/SalesPage";
-import ExpensesPage from "./view/ExpensesPage";
-import ReportsPage from "./view/ReportsPage";
 import AppLayout from "./components/AppLayout";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <Router>
+      <ToastContainer position="top-center" autoClose={3000} />
       <Routes>
         <Route path="/" element={<LogInPage />} />
-        <Route path="/" element={<AppLayout />}>
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="sales" element={<SalesPage />} />
-          <Route path="expenses" element={<ExpensesPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="*" element={<h1>Erro 404 - Uai</h1>} />
-        </Route>
+        <Route path="/*" element={<AppLayout />} />
       </Routes>
     </Router>
   );
