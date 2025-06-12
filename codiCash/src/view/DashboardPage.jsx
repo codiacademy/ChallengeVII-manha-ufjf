@@ -1,8 +1,9 @@
 import React from "react";
+import { SquarePlus  } from "lucide-react";
 // import { setPage } from "../App";
 import LogInPage from "./LogInPage";
 import AppLayout from "../components/AppLayout";
-
+import Buttons from "../components/Buttons";
 
 const DashboardPage = () => {
   return (
@@ -12,6 +13,15 @@ const DashboardPage = () => {
         <p className="text-white text-lg">
           Bem-vindo ao seu painel de controle!
         </p>
+      </div>
+      <div className="mt-8">
+        <Buttons
+          onClick={() => {}}
+          className="mb-4 flex items-center gap-2 rounded-full  px-4 py-2 text-white"
+        >
+          <SquarePlus  size={18} />
+          <span>Nova Venda</span>
+        </Buttons>
       </div>
     </div>
   );

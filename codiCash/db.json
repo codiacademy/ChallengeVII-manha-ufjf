@@ -14,7 +14,7 @@
       "nome": "Yuri",
       "email": "yuri@gmail.com",
       "senha": "yuri",
-      "papel": "admin",
+      "papel": "Admin",
       "data_criacao": "2025-05-02T10:00:00Z",
       "data_atualizacao": "2025-05-02T10:00:00Z"
     },
@@ -23,7 +23,7 @@
       "nome": "Fernando",
       "email": "fernando@gmail.com",
       "senha": "fernando",
-      "papel": "usuario",
+      "papel": "CTO",
       "data_criacao": "2025-05-02T10:00:00Z",
       "data_atualizacao": "2025-05-02T10:00:00Z"
     }
