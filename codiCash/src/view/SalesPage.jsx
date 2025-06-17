@@ -6,31 +6,61 @@ const SalesPage = () => {
   const [columns, setColumns] = useState([]);
 
   useEffect(() => {
-    // Fetch rows
-    fetch("http://localhost:3000/vendas")
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        // If columns endpoint doesn't exist, infer columns from data
-        if (data.length > 0 && columns.length === 0) {
-          setColumns(Object.keys(data[0]));
-        }
-      });
+    // Busca todas as tabelas necessárias
+    Promise.all([
+      fetch("http://localhost:3001/vendas").then((res) => res.json()),
+      fetch("http://localhost:3001/clientes").then((res) => res.json()),
+      fetch("http://localhost:3001/cursos").then((res) => res.json()),
+      fetch("http://localhost:3001/vendedores").then((res) => res.json()),
+      fetch("http://localhost:3001/tiposPagamento").then((res) => res.json()),
+      fetch("http://localhost:3001/status").then((res) => res.json()),
+    ]).then(
+      ({
+        0: vendas,
+        1: clientes,
+        2: cursos,
+        3: vendedores,
+        4: tiposPagamento,
+        5: status,
+      }) => {
+        // Monta os dados enriquecidos
+        const vendasEnriquecidas = vendas.map((venda) => ({
+          id: venda.id,
+          Cliente:
+            clientes.find((c) => c.id === venda.clienteId)?.nome ||
+            venda.clienteId,
+          Curso:
+            cursos.find((c) => c.id === venda.cursoId)?.nome || venda.cursoId,
+          Vendedor:
+            vendedores.find((v) => v.id === venda.vendedorId)?.nome ||
+            venda.vendedorId,
+          "Tipo de Pagamento":
+            tiposPagamento.find((t) => t.id === venda.tipoPagamentoId)?.nome ||
+            venda.tipoPagamentoId,
+          Status:
+            status.find((s) => s.id === venda.statusId)?.nome || venda.statusId,
+          Valor: venda.valorTotal,
+          Data: new Date(venda.data_venda).toLocaleDateString("pt-BR"),
+        }));
 
-    // Optionally fetch columns from endpoint if available
-    fetch("http://localhost:3000/vendas/columns")
-      .then((res) => res.json())
-      .then((cols) => {
-        if (Array.isArray(cols) && cols.length > 0) setColumns(cols);
-      })
-      .catch(() => {
-        // Ignore if endpoint doesn't exist
-      });
+        setData(vendasEnriquecidas);
+        setColumns([
+          "id",
+          "Cliente",
+          "Curso",
+          "Vendedor",
+          "Tipo de Pagamento",
+          "Status",
+          "Valor",
+          "Data",
+        ]);
+      }
+    );
   }, []);
 
   return (
     <div className="bg-[#ffffff] h-full flex flex-col items-center justify-center">
-      <div className="flex flex-col items-center justify-center h-auto w-100 bg-[#a243d2] rounded-lg shadow-lg">
+      <div className="h-auto w-300 bg-[#a243d2] rounded-lg shadow-lg">
         <Table data={data} columns={columns} />
       </div>
     </div>

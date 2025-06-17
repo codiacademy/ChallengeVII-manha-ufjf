@@ -9,7 +9,7 @@ const LogInPage = () => {
 
   const LogIn = async () => {
     try {
-      const response = await fetch('http://localhost:3000/usuarios?nome=' + nome);
+      const response = await fetch('http://localhost:3001/usuarios?nome=' + nome);
       const users = await response.json();
       if (users.length > 0 && users[0].senha === senha) {
         localStorage.setItem("loggedInUser", users[0].nome);

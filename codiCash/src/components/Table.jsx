@@ -1,10 +1,12 @@
 const Table = ({ data, columns }) => {
   return (
-    <table>
+    <table className="w-full">
       <thead>
         <tr>
           {columns.map((column, index) => (
-            <th key={index}>{column}</th>
+            <th key={index} className="text-center">
+              {column}
+            </th>
           ))}
         </tr>
       </thead>
@@ -12,7 +14,9 @@ const Table = ({ data, columns }) => {
         {data.map((row, rowIndex) => (
           <tr key={rowIndex}>
             {columns.map((column, colIndex) => (
-              <td key={colIndex}>{row[column]}</td>
+              <td key={colIndex} className="text-center">
+                {row[column]}
+              </td>
             ))}
           </tr>
         ))}
