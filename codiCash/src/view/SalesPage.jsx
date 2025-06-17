@@ -14,6 +14,8 @@ const SalesPage = () => {
       fetch("http://localhost:3001/vendedores").then((res) => res.json()),
       fetch("http://localhost:3001/tiposPagamento").then((res) => res.json()),
       fetch("http://localhost:3001/status").then((res) => res.json()),
+      fetch("http://localhost:3001/filiais").then((res) => res.json()),
+      fetch("http://localhost:3001/modalidades").then((res) => res.json()),
     ]).then(
       ({
         0: vendas,
@@ -22,15 +24,24 @@ const SalesPage = () => {
         3: vendedores,
         4: tiposPagamento,
         5: status,
+        6: filiais,
+        7: modalidades,
       }) => {
         // Monta os dados enriquecidos
         const vendasEnriquecidas = vendas.map((venda) => ({
-          id: venda.id,
+          Data: new Date(venda.data_venda).toLocaleDateString("pt-BR"),
           Cliente:
             clientes.find((c) => c.id === venda.clienteId)?.nome ||
             venda.clienteId,
           Curso:
             cursos.find((c) => c.id === venda.cursoId)?.nome || venda.cursoId,
+          Modalidade:
+            modalidades.find((m) => m.id === venda.modalidadeId)?.tipo ||
+            venda.modalidadeId,
+          Valor: venda.valorTotal,
+          Filial:
+            filiais.find((f) => f.id === venda.filialId)?.nome ||
+            venda.filialId,
           Vendedor:
             vendedores.find((v) => v.id === venda.vendedorId)?.nome ||
             venda.vendedorId,
@@ -39,20 +50,19 @@ const SalesPage = () => {
             venda.tipoPagamentoId,
           Status:
             status.find((s) => s.id === venda.statusId)?.nome || venda.statusId,
-          Valor: venda.valorTotal,
-          Data: new Date(venda.data_venda).toLocaleDateString("pt-BR"),
         }));
 
         setData(vendasEnriquecidas);
         setColumns([
-          "id",
+          "Data",
           "Cliente",
           "Curso",
+          "Modalidade",
+          "Valor",
+          "Filial",
           "Vendedor",
           "Tipo de Pagamento",
           "Status",
-          "Valor",
-          "Data",
         ]);
       }
     );

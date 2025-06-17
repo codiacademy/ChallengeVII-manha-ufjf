@@ -96,6 +96,8 @@
     "id": "1",
     "clienteId": "1",
     "cursoId": "1",
+    "filialId": "1",
+    "modalidadeId": "1",
     "vendedorId": "1",
     "tipoPagamentoId": "1",
     "statusId": "1",
