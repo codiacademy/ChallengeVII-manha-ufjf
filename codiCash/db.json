@@ -111,6 +111,26 @@
     "data_venda": "2025-05-01T12:00:00Z",
     "data_criacao": "2025-05-01T12:00:00Z",
     "data_atualizacao": "2025-05-01T12:00:00Z"
+    },
+    {
+    "id": "2",
+    "clienteId": "1",
+    "cursoId": "1",
+    "filialId": "1",
+    "modalidadeId": "1",
+    "vendedorId": "1",
+    "tipoPagamentoId": "1",
+    "statusId": "1",
+    "valorBruto": 2700.00,
+    "desconto": 0,
+    "impostos": 100,
+    "comissao": 150,
+    "taxaCartao": 50,
+    "parcelas": 1,
+    "valorTotal": 2600.00,
+    "data_venda": "2025-05-01T12:00:00Z",
+    "data_criacao": "2025-05-01T12:00:00Z",
+    "data_atualizacao": "2025-05-01T12:00:00Z"
     }
 ],
 "pagamentos": [
