@@ -1,21 +1,28 @@
 import React from "react";
 
-
-const Modal = ({ isOpen, onClose, children }) => {
+const Modal = ({ isOpen, onClose, children, position = "top-right" }) => {
   if (!isOpen) return null;
 
+  const positionClasses = {
+    "top-right": "fixed top-4 right-4 mt-12 mr-2",
+    "center": "fixed inset-0 flex items-center justify-center"
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
+    <div className={`${positionClasses[position]} z-50`}>
+      <div className="bg-white rounded-lg shadow-xl border border-gray-200 min-w-[256px]">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 text-[#a243d2] hover:text-[#580581] text-lg font-bold"
         >
           &times;
         </button>
-        {children}
+        <div className="p-4 pt-6">
+          {children}
+        </div>
       </div>
     </div>
   );
-}   
+};
+
 export default Modal;
