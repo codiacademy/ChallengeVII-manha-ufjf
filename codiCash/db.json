@@ -1,5 +1,5 @@
 {
-"usuarios": [
+  "usuarios": [
     {
       "id": "1",
       "nome": "Admin",
@@ -13,113 +13,164 @@
       "id": "2",
       "nome": "Yuri",
       "email": "yuri@gmail.com",
-      "senha": "yuri",
-      "papel": "Admin",
+      "senha": "1234",
+      "papel": "admin",
       "data_criacao": "2025-05-02T10:00:00Z",
-      "data_atualizacao": "2025-05-02T10:00:00Z"
+      "data_atualizacao": "2025-06-23T17:43:47.235Z"
     },
     {
       "id": "3",
-      "nome": "Fernando",
+      "nome": "FernandoZ",
       "email": "fernando@gmail.com",
-      "senha": "fernando",
-      "papel": "CTO",
+      "senha": "12345",
+      "papel": "user",
       "data_criacao": "2025-05-02T10:00:00Z",
-      "data_atualizacao": "2025-05-02T10:00:00Z"
+      "data_atualizacao": "2025-06-24T13:17:40.401Z"
     }
-],
-"clientes": [
+  ],
+  "clientes": [
     {
-    "id": "1",
-    "nome": "João Silva",
-    "email": "joao.silva@example.com",
-    "telefone": "99999-9999",
-    "data_criacao": "2025-05-01T12:00:00Z",
-    "data_atualizacao": "2025-05-01T12:00:00Z"
+      "id": "1",
+      "nome": "João Silva",
+      "email": "joao.silva@example.com",
+      "telefone": "99999-9999",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z"
     }
-],
-"cursos": [
+  ],
+  "cursos": [
     {
-    "id": "1",
-    "nome": "Full Stack",
-    "descricao": "Curso de Desenvolvimento Web Completo",
-    "preco": 2700.00,
-    "modalidadeId": "1",
-    "data_criacao": "2025-05-01T12:00:00Z",
-    "data_atualizacao": "2025-05-01T12:00:00Z"
+      "id": "1",
+      "nome": "Full Stack",
+      "descricao": "Curso de Desenvolvimento Web Completo",
+      "preco": 2700,
+      "modalidadeId": "1",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z"
     }
-],
-"modalidades": [
-    { "id": "1", "tipo": "Presencial" },
-    { "id": "2", "tipo": "Online" }
-],
-"status": [
-    { "id": "1", "nome": "Pago" },
-    { "id": "2", "nome": "Pendente" },
-    { "id": "3", "nome": "Cancelado" }
-],
-"tiposPagamento": [
-    { "id": "1", "nome": "Cartão" },
-    { "id": "2", "nome": "PIX" }
-],
-"filiais": [
-    { "id": "1", "nome": "CRITT", "localizacao": "Centro" },
-    { "id": "2", "nome": "Rio Branco", "localizacao": "Bairro Alto" }
-],
-"vendedores": [
-    { "id": "1", "nome": "Clarissa", "filialId": "1" }
-],
-"tiposDespesas": [
-    { "id": "1", "nome": "Aluguel", "categoriaId": "1" },
-    { "id": "2", "nome": "Luz", "categoriaId": "1" },
-    { "id": "3", "nome": "Folha de Pagamento", "categoriaId": "2" }
-],
-"categoriasDespesas": [
-    { "id": "1", "nome": "Fixa" },
-    { "id": "2", "nome": "Variável" }
-],
-"despesas": [
+  ],
+  "modalidades": [
     {
-    "id": "1",
-    "tipoDespesaId": "1",
-    "filialId": "1",
-    "statusId": "1",
-    "valor": 3500.00,
-    "descricao": "Aluguel CRITT - Maio",
-    "data_despesa": "2025-05-01T12:00:00Z",
-    "data_criacao": "2025-05-01T12:00:00Z",
-    "data_atualizacao": "2025-05-01T12:00:00Z"
-    }
-],
-"vendas": [
+      "id": "1",
+      "tipo": "Presencial"
+    },
     {
-    "id": "1",
-    "clienteId": "1",
-    "cursoId": "1",
-    "vendedorId": "1",
-    "tipoPagamentoId": "1",
-    "statusId": "1",
-    "valorBruto": 2700.00,
-    "desconto": 0,
-    "impostos": 100,
-    "comissao": 150,
-    "taxaCartao": 50,
-    "parcelas": 1,
-    "valorTotal": 2600.00,
-    "data_venda": "2025-05-01T12:00:00Z",
-    "data_criacao": "2025-05-01T12:00:00Z",
-    "data_atualizacao": "2025-05-01T12:00:00Z"
+      "id": "2",
+      "tipo": "Online"
     }
-],
-"pagamentos": [
+  ],
+  "status": [
     {
-    "id": "1",
-    "vendaId": "1",
-    "tipoPagamentoId": "1",
-    "valor": 2600.00,
-    "data_pagamento": "2025-05-01T12:30:00Z",
-    "data_criacao": "2025-05-01T12:30:00Z",
-    "data_atualizacao": "2025-05-01T12:30:00Z"
+      "id": "1",
+      "nome": "Pago"
+    },
+    {
+      "id": "2",
+      "nome": "Pendente"
+    },
+    {
+      "id": "3",
+      "nome": "Cancelado"
     }
-]
+  ],
+  "tiposPagamento": [
+    {
+      "id": "1",
+      "nome": "Cartão"
+    },
+    {
+      "id": "2",
+      "nome": "PIX"
+    }
+  ],
+  "filiais": [
+    {
+      "id": "1",
+      "nome": "CRITT",
+      "localizacao": "Centro"
+    },
+    {
+      "id": "2",
+      "nome": "Rio Branco",
+      "localizacao": "Bairro Alto"
+    }
+  ],
+  "vendedores": [
+    {
+      "id": "1",
+      "nome": "Clarissa",
+      "filialId": "1"
+    }
+  ],
+  "tiposDespesas": [
+    {
+      "id": "1",
+      "nome": "Aluguel",
+      "categoriaId": "1"
+    },
+    {
+      "id": "2",
+      "nome": "Luz",
+      "categoriaId": "1"
+    },
+    {
+      "id": "3",
+      "nome": "Folha de Pagamento",
+      "categoriaId": "2"
+    }
+  ],
+  "categoriasDespesas": [
+    {
+      "id": "1",
+      "nome": "Fixa"
+    },
+    {
+      "id": "2",
+      "nome": "Variável"
+    }
+  ],
+  "despesas": [
+    {
+      "id": "1",
+      "tipoDespesaId": "1",
+      "filialId": "1",
+      "statusId": "1",
+      "valor": 3500,
+      "descricao": "Aluguel CRITT - Maio",
+      "data_despesa": "2025-05-01T12:00:00Z",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z"
+    }
+  ],
+  "vendas": [
+    {
+      "id": "1",
+      "clienteId": "1",
+      "cursoId": "1",
+      "vendedorId": "1",
+      "tipoPagamentoId": "1",
+      "statusId": "1",
+      "valorBruto": 2700,
+      "desconto": 0,
+      "impostos": 100,
+      "comissao": 150,
+      "taxaCartao": 50,
+      "parcelas": 1,
+      "valorTotal": 2600,
+      "data_venda": "2025-05-01T12:00:00Z",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z"
+    }
+  ],
+  "pagamentos": [
+    {
+      "id": "1",
+      "vendaId": "1",
+      "tipoPagamentoId": "1",
+      "valor": 2600,
+      "data_pagamento": "2025-05-01T12:30:00Z",
+      "data_criacao": "2025-05-01T12:30:00Z",
+      "data_atualizacao": "2025-05-01T12:30:00Z"
+    }
+  ]
 }

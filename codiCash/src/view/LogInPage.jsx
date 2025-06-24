@@ -51,7 +51,7 @@ const LogInPage = () => {
           />
           <label htmlFor="senha">Senha:</label>
           <input
-            className="w-full border border-[#a234d2]-300 rounded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#a234d2]-400"
+            className="w-full border border-[#a234d2]-300 roded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#a234d2]-400"
             type="password"
             id="senha"
             name="senha"
