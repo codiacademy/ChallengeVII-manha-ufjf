@@ -7,7 +7,7 @@
       "senha": "admin",
       "papel": "admin",
       "data_criacao": "2025-05-01T12:00:00Z",
-      "data_atualizacao": "2025-05-01T12:00:00Z"
+      "data_atualizacao": "2025-06-24T14:25:41.912Z"
     },
     {
       "id": "2",
@@ -19,13 +19,12 @@
       "data_atualizacao": "2025-06-23T17:43:47.235Z"
     },
     {
-      "id": "3",
-      "nome": "FernandoZ",
+      "nome": "Fernando",
       "email": "fernando@gmail.com",
-      "senha": "12345",
+      "senha": "",
       "papel": "user",
-      "data_criacao": "2025-05-02T10:00:00Z",
-      "data_atualizacao": "2025-06-24T13:17:40.401Z"
+      "data_atualizacao": "2025-06-24T14:24:54.071Z",
+      "id": "3"
     }
   ],
   "clientes": [

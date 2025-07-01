@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "../components/Table";
 import { useNavigate } from "react-router-dom";
+import { SquarePlus  } from "lucide-react";
+import Buttons from "../components/Buttons";
 
 const SalesPage = () => {
   const navigate = useNavigate();
@@ -173,15 +175,19 @@ const SalesPage = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 flex flex-col items-center">
       <div className="w-full max-w-6xl flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 w-full text-left">
+        <h2 className="text-2xl font-bold text-[#a243d2] mb-6 w-full text-left">
           Vendas
         </h2>
-        <button
-          className="mb-6 bg-purple-600 text-white font-bold py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 self-end"
+        <div className="flex flex-row justify-between w-full">
+        <p className="text-[#a243d2] text-left w-full">Lançamento  e gerenciamento de vendas de cursos</p>
+        <Buttons
+          className="mb-4 flex flex-row items-center gap-2 rounded-full  px-4 py-2 text-white hover:bg-purple-600 w-45 outline-purple-300 outline-4"
           onClick={() => navigate("/newSale")}
         >
-          Nova Venda
-        </button>
+          <SquarePlus  size={18} />
+          <span>Nova Venda</span>
+        </Buttons>
+        </div>
         <div className="bg-white rounded-xl shadow p-6 w-full">
           <Table
             data={data}
