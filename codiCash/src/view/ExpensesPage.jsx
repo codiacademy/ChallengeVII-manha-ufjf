@@ -47,26 +47,38 @@ const ExpensesPage = () => {
         const despesasEnriquecidas = despesas.map((despesa) => ({
           id: despesa.id,
           Data: new Date(despesa.data_despesa).toLocaleDateString("pt-BR"),
-          Tipo:
-            tiposDespesas.find((t) => t.id === despesa.tipoDespesaId)?.nome ||
-            despesa.tipoDespesaId,
-          Valor: despesa.valor,
-          Filial:
-            filiais.find((f) => f.id === despesa.filialId)?.nome ||
-            despesa.filialId,
-          Status:
-            status.find((s) => s.id === despesa.statusId)?.nome ||
-            despesa.statusId,
           Categoria:
             categoriasDespesas.find((c) => c.id === tiposDespesas.find((t) => t.id === despesa.tipoDespesaId)?.categoriaId)?.nome ||
             "",
+          Filial:
+            filiais.find((f) => f.id === despesa.filialId)?.nome ||
+            despesa.filialId,
+          Descrição:
+            tiposDespesas.find((t) => t.id === despesa.tipoDespesaId)?.descricao ||
+            despesa.descricao ||
+            "",
+          Valor: `R$ ${Number(despesa.valor).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          })}`,
+          Pagamento: "PIX", // ajuste conforme seu backend
+          Status:
+            status.find((s) => s.id === despesa.statusId)?.nome ||
+            despesa.statusId,
           statusId: despesa.statusId,
           valor: despesa.valor,
           data_despesa: despesa.data_despesa,
         }));
 
         setData(despesasEnriquecidas);
-        setColumns(["Data", "Tipo", "Valor", "Filial", "Status", "Categoria"]);
+        setColumns([
+          "Data",
+          "Categoria",
+          "Filial",
+          "Descrição",
+          "Valor",
+          "Pagamento",
+          "Status",
+        ]);
       }
     );
   }, []);
@@ -123,7 +135,9 @@ const ExpensesPage = () => {
         item.id === selectedRow.id
           ? {
               ...item,
-              Valor: editValor,
+              Valor: `R$ ${Number(editValor).toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+              })}`,
               Status: statusMap[editStatus] || editStatus,
             }
           : item
@@ -143,18 +157,43 @@ const ExpensesPage = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 flex flex-col items-center">
+    <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
       <div className="w-full max-w-5xl flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 w-full text-left">
+        <h2 className="text-4xl font-bold text-[#a243d2] mt-6 mb-1 w-full text-left">
           Despesas
         </h2>
-        <div className="bg-white rounded-xl shadow p-6 w-full">
+        <p className="text-[#a243d2] text-lg mb-6 w-full text-left">
+          Lançamento e gerenciamento de despesas fixas e variáveis
+        </p>
+        <div className="flex flex-row gap-2 mb-4 w-full">
+          <button className="px-4 py-2 rounded-full bg-[#e9e0f7] text-[#a243d2] font-semibold border border-[#a243d2] shadow-sm">
+            Despesas fixas
+          </button>
+          <button className="px-4 py-2 rounded-full bg-[#e9e0f7] text-[#a243d2] font-semibold border border-[#a243d2] shadow-sm opacity-60">
+            Despesas Variáveis
+          </button>
+          <div className="flex-1" />
+          <button
+            className="flex flex-row items-center gap-2 rounded-full px-4 py-2 text-[#a243d2] border border-[#a243d2] bg-white hover:bg-[#a243d2] hover:text-white transition-colors font-semibold shadow-sm"
+            // onClick para nova despesa
+          >
+            <span className="text-lg">➕</span>
+            <span>Nova Despesa</span>
+          </button>
+        </div>
+        <div className="flex flex-row justify-end w-full mb-2">
+          <input
+            className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] placeholder-[#a243d2] bg-transparent"
+            placeholder="Buscar"
+          />
+        </div>
+        <div className="bg-white rounded-2xl shadow-lg p-0 w-full border-2 border-[#a243d2]">
           <Table
             data={data}
             columns={columns}
             renderActions={(row) => (
               <button
-                className="text-xl px-2"
+                className="text-xl px-2 rounded hover:bg-[#f3f8fc]"
                 onClick={(e) => handleOpenPopover(row, e)}
                 title="Ações"
               >
@@ -162,6 +201,11 @@ const ExpensesPage = () => {
               </button>
             )}
           />
+        </div>
+        <div className="w-full flex justify-end mt-2">
+          <span className="text-[#a243d2] text-sm cursor-pointer hover:underline">
+            Mostrar mais
+          </span>
         </div>
       </div>
       {showPopover && selectedRow && (
@@ -181,16 +225,21 @@ const ExpensesPage = () => {
           }}
         >
           <button
-            className="block w-full text-left mb-2 text-blue-600"
-            onClick={handleEdit}
+            className="flex items-center gap-2 w-full text-left mb-2 text-[#a243d2] hover:bg-[#f3f8fc] px-2 py-1 rounded"
           >
-            Editar
+            <span role="img" aria-label="Visualizar">👁️</span> Visualizar
           </button>
           <button
-            className="block w-full text-left text-red-600"
+            className="flex items-center gap-2 w-full text-left mb-2 text-[#a243d2] hover:bg-[#f3f8fc] px-2 py-1 rounded"
+            onClick={handleEdit}
+          >
+            <span role="img" aria-label="Editar">✏️</span> Editar
+          </button>
+          <button
+            className="flex items-center gap-2 w-full text-left text-red-600 hover:bg-red-50 px-2 py-1 rounded"
             onClick={handleDelete}
           >
-            Excluir
+            <span role="img" aria-label="Excluir">🗑️</span> Excluir
           </button>
         </div>
       )}
@@ -216,7 +265,7 @@ const ExpensesPage = () => {
               type="number"
               value={editValor}
               onChange={(e) => setEditValor(e.target.value)}
-              className="border p-1 w-full"
+              className="border p-1 w-full rounded"
             />
           </div>
           <div className="mb-2">
@@ -224,7 +273,7 @@ const ExpensesPage = () => {
             <select
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value)}
-              className="border p-1 w-full"
+              className="border p-1 w-full rounded"
             >
               <option value="">Selecione</option>
               {statusList.map((s) => (

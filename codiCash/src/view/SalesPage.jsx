@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "../components/Table";
 import { useNavigate } from "react-router-dom";
-import { SquarePlus  } from "lucide-react";
+import { SquarePlus } from "lucide-react";
 import Buttons from "../components/Buttons";
 
 const SalesPage = () => {
@@ -67,14 +67,16 @@ const SalesPage = () => {
           Modalidade:
             modalidades.find((m) => m.id === venda.modalidadeId)?.tipo ||
             venda.modalidadeId,
-          Valor: venda.valorTotal,
+          Valor: `R$ ${Number(venda.valorTotal).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          })}`,
           Filial:
             filiais.find((f) => f.id === venda.filialId)?.nome ||
             venda.filialId,
           Vendedor:
             vendedores.find((v) => v.id === venda.vendedorId)?.nome ||
             venda.vendedorId,
-          "Tipo de Pagamento":
+          Pagamento:
             tiposPagamento.find((t) => t.id === venda.tipoPagamentoId)?.nome ||
             venda.tipoPagamentoId,
           Status:
@@ -93,7 +95,7 @@ const SalesPage = () => {
           "Valor",
           "Filial",
           "Vendedor",
-          "Tipo de Pagamento",
+          "Pagamento",
           "Status",
         ]);
       }
@@ -153,7 +155,9 @@ const SalesPage = () => {
         item.id === selectedRow.id
           ? {
               ...item,
-              Valor: editValor,
+              Valor: `R$ ${Number(editValor).toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+              })}`,
               Status: statusMap[editStatus] || editStatus,
             }
           : item
@@ -173,34 +177,38 @@ const SalesPage = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 flex flex-col items-center">
+    <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
       <div className="w-full max-w-6xl flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-[#a243d2] mb-6 w-full text-left">
+        <h2 className="text-4xl font-bold text-[#a243d2] mt-6 mb-1 w-full text-left">
           Vendas
         </h2>
-        <div className="flex flex-row justify-between w-full">
-        <p className="text-[#a243d2] text-left w-full">Lançamento  e gerenciamento de vendas de cursos</p>
-        <Buttons
-          className="mb-4 flex flex-row items-center gap-2 rounded-full  px-4 py-2 text-white hover:bg-purple-600 w-45 outline-purple-300 outline-4"
-          onClick={() => navigate("/newSale")}
-        >
-          <SquarePlus  size={18} />
-          <span>Nova Venda</span>
-        </Buttons>
+        <p className="text-[#a243d2] text-lg mb-6 w-full text-left">
+          Lançamento e gerenciamento de vendas de cursos
+        </p>
+        <div className="flex flex-row justify-between w-full mb-4">
+          <div />
+          <Buttons
+            className="flex flex-row items-center gap-2 rounded-full px-4 py-2 text-[#a243d2] border border-[#a243d2] bg-white hover:bg-[#a243d2] hover:text-white transition-colors font-semibold shadow-sm"
+            onClick={() => navigate("/newSale")}
+          >
+            <SquarePlus size={18} />
+            <span>Nova Venda</span>
+          </Buttons>
         </div>
-        <div className="bg-white rounded-xl shadow p-6 w-full">
+        <div className="bg-white rounded-2xl shadow-lg p-0 w-full border-2 border-[#a243d2]">
           <Table
             data={data}
             columns={columns}
             renderActions={(row) => (
               <button
-                className="text-xl px-2"
+                className="text-xl px-2 rounded hover:bg-[#f3f8fc]"
                 onClick={(e) => handleOpenPopover(row, e)}
                 title="Ações"
               >
                 &#8942;
               </button>
             )}
+            // Adapte o Table.jsx para estilizar células especiais (veja nota abaixo)
           />
         </div>
       </div>
@@ -221,16 +229,22 @@ const SalesPage = () => {
           }}
         >
           <button
-            className="block w-full text-left mb-2 text-blue-600"
-            onClick={handleEdit}
+            className="flex items-center gap-2 w-full text-left mb-2 text-[#a243d2] hover:bg-[#f3f8fc] px-2 py-1 rounded"
+            // ícone de visualizar pode ser adicionado aqui
           >
-            Editar
+            <span role="img" aria-label="Visualizar">👁️</span> Visualizar
           </button>
           <button
-            className="block w-full text-left text-red-600"
+            className="flex items-center gap-2 w-full text-left mb-2 text-[#a243d2] hover:bg-[#f3f8fc] px-2 py-1 rounded"
+            onClick={handleEdit}
+          >
+            <span role="img" aria-label="Editar">✏️</span> Editar
+          </button>
+          <button
+            className="flex items-center gap-2 w-full text-left text-red-600 hover:bg-red-50 px-2 py-1 rounded"
             onClick={handleDelete}
           >
-            Excluir
+            <span role="img" aria-label="Excluir">🗑️</span> Excluir
           </button>
         </div>
       )}
@@ -256,7 +270,7 @@ const SalesPage = () => {
               type="number"
               value={editValor}
               onChange={(e) => setEditValor(e.target.value)}
-              className="border p-1 w-full"
+              className="border p-1 w-full rounded"
             />
           </div>
           <div className="mb-2">
@@ -264,7 +278,7 @@ const SalesPage = () => {
             <select
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value)}
-              className="border p-1 w-full"
+              className="border p-1 w-full rounded"
             >
               <option value="">Selecione</option>
               {statusList.map((s) => (
