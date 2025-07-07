@@ -18,8 +18,8 @@ const Table = ({ data, columns, renderActions }) => {
                 className={
                   column === "Modalidade"
                     ? row[column] === "Presencial"
-                      ? "px-2 py-1 rounded-full border border-[#a243d2] text-[#a243d2] font-semibold bg-white"
-                      : "px-2 py-1 rounded-full border border-black text-white bg-black font-semibold"
+                      ? "px-2 py-1 rounded-full bg-[#a243d2] text-white font-semibold"
+                      : "px-2 py-1 rounded-full bg-emerald-600 text-white font-semibold"
                     : column === "Pagamento"
                     ? row[column] === "PIX"
                       ? "px-2 py-1 rounded-full bg-emerald-500 text-white font-semibold"

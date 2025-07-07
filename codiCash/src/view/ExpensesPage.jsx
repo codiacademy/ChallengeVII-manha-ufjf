@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "../components/Table";
+import { useNavigate } from "react-router-dom";
+import { SquarePlus } from "lucide-react";
+import Buttons from "../components/Buttons";
 
 const ExpensesPage = () => {
   const [data, setData] = useState([]);
@@ -8,6 +11,7 @@ const ExpensesPage = () => {
   const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const popoverRef = useRef();
+  const modalRef = useRef();
 
   const [showEditForm, setShowEditForm] = useState(false);
   const [editValor, setEditValor] = useState("");
@@ -15,6 +19,12 @@ const ExpensesPage = () => {
   const [statusList, setStatusList] = useState([]);
   const [despesasOriginais, setDespesasOriginais] = useState([]);
   const [statusMap, setStatusMap] = useState({});
+
+  // Para modal de nova despesa
+  const [showNewExpenseModal, setShowNewExpenseModal] = useState(false);
+  const [tiposDespesas, setTiposDespesas] = useState([]);
+  const [filiais, setFiliais] = useState([]);
+  const [categoriasDespesas, setCategoriasDespesas] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:3001/status")
@@ -35,26 +45,29 @@ const ExpensesPage = () => {
       fetch("http://localhost:3001/filiais").then((res) => res.json()),
       fetch("http://localhost:3001/categoriasDespesas").then((res) => res.json()),
     ]).then(
-      ([
+      ( [
         despesas,
-        tiposDespesas,
+        tiposDespesasData,
         status,
-        filiais,
-        categoriasDespesas,
+        filiaisData,
+        categoriasDespesasData,
       ]) => {
         setDespesasOriginais(despesas);
+        setTiposDespesas(tiposDespesasData);
+        setFiliais(filiaisData);
+        setCategoriasDespesas(categoriasDespesasData);
 
         const despesasEnriquecidas = despesas.map((despesa) => ({
           id: despesa.id,
           Data: new Date(despesa.data_despesa).toLocaleDateString("pt-BR"),
           Categoria:
-            categoriasDespesas.find((c) => c.id === tiposDespesas.find((t) => t.id === despesa.tipoDespesaId)?.categoriaId)?.nome ||
+            categoriasDespesasData.find((c) => c.id === tiposDespesasData.find((t) => t.id === despesa.tipoDespesaId)?.categoriaId)?.nome ||
             "",
           Filial:
-            filiais.find((f) => f.id === despesa.filialId)?.nome ||
+            filiaisData.find((f) => f.id === despesa.filialId)?.nome ||
             despesa.filialId,
           Descrição:
-            tiposDespesas.find((t) => t.id === despesa.tipoDespesaId)?.descricao ||
+            tiposDespesasData.find((t) => t.id === despesa.tipoDespesaId)?.descricao ||
             despesa.descricao ||
             "",
           Valor: `R$ ${Number(despesa.valor).toLocaleString("pt-BR", {
@@ -108,7 +121,7 @@ const ExpensesPage = () => {
   }, [showPopover, showEditForm]);
 
   const handleEdit = () => {
-    setEditValor(selectedRow.Valor);
+    setEditValor(selectedRow.Valor.replace(/[^\d,]/g, "").replace(",", "."));
     setEditStatus(
       statusList.find((s) => s.nome === selectedRow.Status)?.id || ""
     );
@@ -156,6 +169,77 @@ const ExpensesPage = () => {
     setSelectedRow(null);
   };
 
+  // --- Modal Nova Despesa ---
+  const [form, setForm] = useState({
+    tipoDespesaId: "",
+    valor: "",
+    filialId: "",
+    statusId: "",
+    data_despesa: "",
+    descricao: "",
+  });
+
+  const handleFormChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleNewExpenseSubmit = async (e) => {
+    e.preventDefault();
+    const novaDespesa = {
+      ...form,
+      valor: Number(form.valor),
+      data_despesa: form.data_despesa || new Date().toISOString(),
+    };
+    await fetch("http://localhost:3001/despesas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(novaDespesa),
+    });
+    setShowNewExpenseModal(false);
+    setForm({
+      tipoDespesaId: "",
+      valor: "",
+      filialId: "",
+      statusId: "",
+      data_despesa: "",
+      descricao: "",
+    });
+    // Atualiza a lista (ideal: refaça o fetch)
+    setData((prev) => [
+      ...prev,
+      {
+        ...novaDespesa,
+        id: Math.random().toString(36).substr(2, 9),
+        Data: new Date(novaDespesa.data_despesa).toLocaleDateString("pt-BR"),
+        Categoria:
+          categoriasDespesas.find((c) => c.id === tiposDespesas.find((t) => t.id === novaDespesa.tipoDespesaId)?.categoriaId)?.nome ||
+          "",
+        Filial: filiais.find((f) => f.id === novaDespesa.filialId)?.nome || "",
+        Descrição:
+          tiposDespesas.find((t) => t.id === novaDespesa.tipoDespesaId)?.descricao ||
+          novaDespesa.descricao ||
+          "",
+        Valor: `R$ ${Number(novaDespesa.valor).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
+        Pagamento: "PIX",
+        Status:
+          statusList.find((s) => s.id === novaDespesa.statusId)?.nome || "",
+      },
+    ]);
+  };
+
+  useEffect(() => {
+    if (!showNewExpenseModal) return;
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setShowNewExpenseModal(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNewExpenseModal]);
+
   return (
     <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
       <div className="w-full max-w-5xl flex flex-col items-center">
@@ -173,13 +257,13 @@ const ExpensesPage = () => {
             Despesas Variáveis
           </button>
           <div className="flex-1" />
-          <button
-            className="flex flex-row items-center gap-2 rounded-full px-4 py-2 text-[#a243d2] border border-[#a243d2] bg-white hover:bg-[#a243d2] hover:text-white transition-colors font-semibold shadow-sm"
-            // onClick para nova despesa
+          <Buttons
+            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm"
+            onClick={() => setShowNewExpenseModal(true)}
           >
-            <span className="text-lg">➕</span>
+            <SquarePlus size={18} />
             <span>Nova Despesa</span>
-          </button>
+          </Buttons>
         </div>
         <div className="flex flex-row justify-end w-full mb-2">
           <input
@@ -298,6 +382,89 @@ const ExpensesPage = () => {
           >
             Cancelar
           </button>
+        </div>
+      )}
+      {/* Modal Nova Despesa */}
+      {showNewExpenseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
+          >
+            <button
+              className="absolute top-2 right-4 text-2xl text-[#a243d2] font-bold"
+              onClick={() => setShowNewExpenseModal(false)}
+            >
+              ×
+            </button>
+            <h3 className="text-2xl font-bold text-[#a243d2] mb-4">Nova Despesa</h3>
+            <form onSubmit={handleNewExpenseSubmit} className="flex flex-col gap-4">
+              <select
+                name="tipoDespesaId"
+                value={form.tipoDespesaId}
+                onChange={handleFormChange}
+                className="border rounded p-2"
+                required
+              >
+                <option value="">Selecione o Tipo de Despesa</option>
+                {tiposDespesas.map((t) => (
+                  <option key={t.id} value={t.id}>{t.nome}</option>
+                ))}
+              </select>
+              <input
+                className="border rounded p-2"
+                name="valor"
+                placeholder="Valor"
+                type="number"
+                value={form.valor}
+                onChange={handleFormChange}
+                required
+              />
+              <select
+                name="filialId"
+                value={form.filialId}
+                onChange={handleFormChange}
+                className="border rounded p-2"
+              >
+                <option value="">Selecione a Filial</option>
+                {filiais.map((f) => (
+                  <option key={f.id} value={f.id}>{f.nome}</option>
+                ))}
+              </select>
+              <select
+                name="statusId"
+                value={form.statusId}
+                onChange={handleFormChange}
+                className="border rounded p-2"
+                required
+              >
+                <option value="">Selecione o Status</option>
+                {statusList.map((s) => (
+                  <option key={s.id} value={s.id}>{s.nome}</option>
+                ))}
+              </select>
+              <input
+                className="border rounded p-2"
+                name="data_despesa"
+                type="date"
+                value={form.data_despesa}
+                onChange={handleFormChange}
+              />
+              <input
+                className="border rounded p-2"
+                name="descricao"
+                placeholder="Descrição"
+                value={form.descricao}
+                onChange={handleFormChange}
+              />
+              <button
+                type="submit"
+                className="bg-[#a243d2] text-white rounded px-4 py-2 font-semibold mt-2"
+              >
+                Salvar
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
