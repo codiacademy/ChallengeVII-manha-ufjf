@@ -3,6 +3,12 @@ import Table from "../components/Table";
 import { SquarePlus } from "lucide-react";
 import Buttons from "../components/Buttons";
 
+function getNextId(array) {
+  if (!array || array.length === 0) return "1";
+  const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
+  return String(maxId + 1);
+}
+
 const SalesPage = () => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -10,9 +16,8 @@ const SalesPage = () => {
   const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const popoverRef = useRef();
-  const modalRef = useRef(); // Adicione este ref
+  const modalRef = useRef();
 
-  // Para edição
   const [showEditForm, setShowEditForm] = useState(false);
   const [editValor, setEditValor] = useState("");
   const [editStatus, setEditStatus] = useState("");
@@ -20,7 +25,6 @@ const SalesPage = () => {
   const [vendasOriginais, setVendasOriginais] = useState([]);
   const [statusMap, setStatusMap] = useState({});
 
-  // Para modal de nova venda
   const [showNewSaleModal, setShowNewSaleModal] = useState(false);
   const [clientes, setClientes] = useState([]);
   const [cursos, setCursos] = useState([]);
@@ -29,7 +33,13 @@ const SalesPage = () => {
   const [vendedores, setVendedores] = useState([]);
   const [tiposPagamento, setTiposPagamento] = useState([]);
 
-  // Dados auxiliares para edição
+  // Novo Cliente
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
+  const [nomeCliente, setNomeCliente] = useState("");
+  const [emailCliente, setEmailCliente] = useState("");
+  const [telefoneCliente, setTelefoneCliente] = useState("");
+  const clientModalRef = useRef();
+
   useEffect(() => {
     fetch("http://localhost:3001/status")
       .then((res) => res.json())
@@ -189,7 +199,6 @@ const SalesPage = () => {
     setSelectedRow(null);
   };
 
-  // --- Modal Nova Venda ---
   const [form, setForm] = useState({
     clienteId: "",
     cursoId: "",
@@ -208,8 +217,10 @@ const SalesPage = () => {
 
   const handleNewSaleSubmit = async (e) => {
     e.preventDefault();
+    const novoId = getNextId(data); // data é o array de vendas já carregado
     const novaVenda = {
       ...form,
+      id: novoId,
       valorTotal: Number(form.valorTotal),
       data_venda: form.data_venda || new Date().toISOString(),
     };
@@ -230,33 +241,22 @@ const SalesPage = () => {
       statusId: "",
       data_venda: "",
     });
-    // Atualiza a lista
-    // (Ideal: refaça o fetch, mas aqui só para exemplo)
-    setData((prev) => [
-      ...prev,
-      {
-        ...novaVenda,
-        id: Math.random().toString(36).substr(2, 9),
-        Data: new Date(novaVenda.data_venda).toLocaleDateString("pt-BR"),
-        Cliente: clientes.find((c) => c.id === novaVenda.clienteId)?.nome || "",
-        Curso: cursos.find((c) => c.id === novaVenda.cursoId)?.nome || "",
-        Modalidade:
-          modalidades.find((m) => m.id === novaVenda.modalidadeId)?.tipo || "",
-        Valor: `R$ ${Number(novaVenda.valorTotal).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`,
-        Filial: filiais.find((f) => f.id === novaVenda.filialId)?.nome || "",
-        Vendedor:
-          vendedores.find((v) => v.id === novaVenda.vendedorId)?.nome || "",
-        Pagamento:
-          tiposPagamento.find((t) => t.id === novaVenda.tipoPagamentoId)?.nome ||
-          "",
-        Status:
-          statusList.find((s) => s.id === novaVenda.statusId)?.nome || "",
-      },
-    ]);
+    setData((prev) => [...prev, novaVenda]);
   };
 
+  // Modal Novo Cliente: fecha ao clicar fora
+  useEffect(() => {
+    if (!showNewClientModal) return;
+    const handleClickOutside = (event) => {
+      if (clientModalRef.current && !clientModalRef.current.contains(event.target)) {
+        setShowNewClientModal(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNewClientModal]);
+
+  // Modal Nova Venda: fecha ao clicar fora
   useEffect(() => {
     if (!showNewSaleModal) return;
     const handleClickOutside = (event) => {
@@ -268,6 +268,28 @@ const SalesPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNewSaleModal]);
 
+  // Cadastro de novo cliente
+  const handleNewClientSubmit = async (e) => {
+    e.preventDefault();
+    const novoId = getNextId(clientes);
+    const novoCliente = {
+      id: novoId,
+      nome: nomeCliente,
+      email: emailCliente,
+      telefone: telefoneCliente,
+    };
+    await fetch("http://localhost:3001/clientes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(novoCliente),
+    });
+    setShowNewClientModal(false);
+    setNomeCliente("");
+    setEmailCliente("");
+    setTelefoneCliente("");
+    setClientes((prev) => [...prev, novoCliente]);
+  };
+
   return (
     <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
       <div className="w-full max-w-6xl flex flex-col items-center">
@@ -277,10 +299,17 @@ const SalesPage = () => {
         <p className="text-[#a243d2] text-lg mb-6 w-full text-left">
           Lançamento e gerenciamento de vendas de cursos
         </p>
-        <div className="flex flex-row justify-between w-full mb-4">
+        <div className="flex flex-row justify-end w-full mb-4">
           <div />
           <Buttons
-            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm"
+            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-white text-[#a243d2] font-semibold shadow-sm hover:bg-gray-300"
+            onClick={() => setShowNewClientModal(true)}
+          >
+            <SquarePlus size={18} className="text-[#a243d2]"/>
+            <span className="text-[#a243d2]">Novo Cliente</span>
+          </Buttons>  
+          <Buttons
+            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm ml-4"
             onClick={() => setShowNewSaleModal(true)}
           >
             <SquarePlus size={18} />
@@ -508,6 +537,56 @@ const SalesPage = () => {
                 type="date"
                 value={form.data_venda}
                 onChange={handleFormChange}
+              />
+              <button
+                type="submit"
+                className="bg-[#a243d2] text-white rounded px-4 py-2 font-semibold mt-2"
+              >
+                Salvar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Modal Novo Cliente */}
+      {showNewClientModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
+          <div
+            ref={clientModalRef}
+            className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md border-2 border-[#a243d2] relative"
+          >
+            <button
+              className="absolute top-2 right-4 text-2xl text-[#a243d2] font-bold"
+              onClick={() => setShowNewClientModal(false)}
+            >
+              ×
+            </button>
+            <h3 className="text-2xl font-bold text-[#a243d2] mb-4">Novo Cliente</h3>
+            <form onSubmit={handleNewClientSubmit} className="flex flex-col gap-4">
+              <input
+                className="border rounded p-2"
+                name="nome"
+                placeholder="Nome"
+                value={nomeCliente}
+                onChange={e => setNomeCliente(e.target.value)}
+                required
+              />
+              <input
+                className="border rounded p-2"
+                name="email"
+                placeholder="Email"
+                type="email"
+                value={emailCliente}
+                onChange={e => setEmailCliente(e.target.value)}
+                required
+              />
+              <input
+                className="border rounded p-2"
+                name="telefone"
+                placeholder="Telefone"
+                value={telefoneCliente}
+                onChange={e => setTelefoneCliente(e.target.value)}
+                required
               />
               <button
                 type="submit"

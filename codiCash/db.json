@@ -35,6 +35,12 @@
       "telefone": "99999-9999",
       "data_criacao": "2025-05-01T12:00:00Z",
       "data_atualizacao": "2025-05-01T12:00:00Z"
+    },
+    {
+      "id": "2",
+      "nome": "John Textor",
+      "email": "theboss@textor.eagle.com",
+      "telefone": "6524429"
     }
   ],
   "cursos": [

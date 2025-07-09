@@ -4,6 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { SquarePlus } from "lucide-react";
 import Buttons from "../components/Buttons";
 
+function getNextId(array) {
+  if (!array || array.length === 0) return "1";
+  const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
+  return String(maxId + 1);
+}
+
 const ExpensesPage = () => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -185,8 +191,10 @@ const ExpensesPage = () => {
 
   const handleNewExpenseSubmit = async (e) => {
     e.preventDefault();
+    const novoId = getNextId(data); // data é o array de despesas já carregado
     const novaDespesa = {
       ...form,
+      id: novoId,
       valor: Number(form.valor),
       data_despesa: form.data_despesa || new Date().toISOString(),
     };
@@ -204,29 +212,7 @@ const ExpensesPage = () => {
       data_despesa: "",
       descricao: "",
     });
-    // Atualiza a lista (ideal: refaça o fetch)
-    setData((prev) => [
-      ...prev,
-      {
-        ...novaDespesa,
-        id: Math.random().toString(36).substr(2, 9),
-        Data: new Date(novaDespesa.data_despesa).toLocaleDateString("pt-BR"),
-        Categoria:
-          categoriasDespesas.find((c) => c.id === tiposDespesas.find((t) => t.id === novaDespesa.tipoDespesaId)?.categoriaId)?.nome ||
-          "",
-        Filial: filiais.find((f) => f.id === novaDespesa.filialId)?.nome || "",
-        Descrição:
-          tiposDespesas.find((t) => t.id === novaDespesa.tipoDespesaId)?.descricao ||
-          novaDespesa.descricao ||
-          "",
-        Valor: `R$ ${Number(novaDespesa.valor).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`,
-        Pagamento: "PIX",
-        Status:
-          statusList.find((s) => s.id === novaDespesa.statusId)?.nome || "",
-      },
-    ]);
+    setData((prev) => [...prev, novaDespesa]);
   };
 
   useEffect(() => {
