@@ -6,14 +6,97 @@ import { toast } from "react-toastify";
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem("settingsActiveTab") || "profile");
   const [users, setUsers] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [filiais, setFiliais] = useState([]);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isVendedorModalOpen, setIsVendedorModalOpen] = useState(false);
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentVendedor, setCurrentVendedor] = useState(null);
+  const [currentClient, setCurrentClient] = useState(null);
+  const [clientes, setClientes] = useState([]);
+  const [clientForm, setClientForm] = useState({
+    nome: "",
+    email: "",
+    telefone: "",
+  });
+  // Função utilitária para IDs sequenciais string
+  function getNextId(array) {
+    if (!array || array.length === 0) return "1";
+    const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
+    return String(maxId + 1);
+  }
+  // CLIENTES
+  const fetchClientes = () => {
+    fetch("http://localhost:3001/clientes")
+      .then((response) => response.json())
+      .then((data) => setClientes(data))
+      .catch((error) => console.error("Error fetching clientes:", error));
+  };
+
+  const handleClientFormChange = (e) => {
+    const { name, value } = e.target;
+    setClientForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleClientSubmit = async (e) => {
+    e.preventDefault();
+    const method = currentClient ? "PUT" : "POST";
+    const url = currentClient
+      ? `http://localhost:3001/clientes/${currentClient.id}`
+      : "http://localhost:3001/clientes";
+    const id = currentClient ? currentClient.id : getNextId(clientes);
+    const body = {
+      ...clientForm,
+      id,
+      data_atualizacao: new Date().toISOString(),
+      ...(!currentClient && { data_criacao: new Date().toISOString() }),
+    };
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) throw new Error("Erro na requisição");
+      toast.success(currentClient ? "Cliente atualizado!" : "Cliente criado!");
+      fetchClientes();
+      setIsClientModalOpen(false);
+      setCurrentClient(null);
+      setClientForm({ nome: "", email: "", telefone: "" });
+    } catch (error) {
+      toast.error("Erro ao salvar cliente");
+      console.error("Error:", error);
+    }
+  };
+
+  const handleEditClient = (client) => {
+    setCurrentClient(client);
+    setClientForm({
+      nome: client.nome,
+      email: client.email,
+      telefone: client.telefone,
+    });
+    setIsClientModalOpen(true);
+  };
+
+  const handleDeleteClient = (clientId) => {
+    if (window.confirm("Tem certeza que deseja deletar este cliente?")) {
+      fetch(`http://localhost:3001/clientes/${clientId}`, {
+        method: "DELETE",
+      })
+        .then(() => {
+          toast.success("Cliente deletado!");
+          fetchClientes();
+        })
+        .catch((error) => {
+          toast.error("Erro ao deletar cliente");
+          console.error("Error:", error);
+        });
+    }
+  };
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -53,10 +136,17 @@ const SettingsPage = () => {
       fetchUsers();
       fetchVendedores();
       fetchFiliais();
+      fetchClientes();
     } else {
       navigate("/");
     }
   }, [navigate]);
+
+  // Persistir aba ativa
+  useEffect(() => {
+    localStorage.setItem("settingsActiveTab", activeTab);
+  }, [activeTab]);
+  // ...existing code...
 
   const fetchUsers = () => {
     fetch("http://localhost:3001/usuarios")
@@ -292,6 +382,69 @@ const SettingsPage = () => {
 
   return (
     <div className="p-6">
+      {/* ...existing code for the rest of the page... */}
+      <Modal
+        isOpen={isClientModalOpen}
+        onClose={() => {
+          setIsClientModalOpen(false);
+          setCurrentClient(null);
+        }}
+        position="center"
+      >
+        <h2 className="text-xl font-semibold mb-4 text-[#a243d2]">
+          {currentClient ? "Editar Cliente" : "Adicionar Novo Cliente"}
+        </h2>
+        <form onSubmit={handleClientSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+            <input
+              type="text"
+              name="nome"
+              value={clientForm.nome}
+              onChange={handleClientFormChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={clientForm.email}
+              onChange={handleClientFormChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+            <input
+              type="text"
+              name="telefone"
+              value={clientForm.telefone}
+              onChange={handleClientFormChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsClientModalOpen(false);
+                setCurrentClient(null);
+              }}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+            <Buttons type="submit">
+              {currentClient ? "Atualizar" : "Salvar"}
+            </Buttons>
+          </div>
+        </form>
+      </Modal>
       <h1 className="text-3xl font-bold text-[#a243d2] mb-6">Configurações</h1>
 
       <div className="flex border-b border-gray-200 mb-6">
@@ -319,6 +472,16 @@ const SettingsPage = () => {
         )}
         <button
           className={`py-2 px-4 font-medium ${
+            activeTab === "clients"
+              ? "text-[#a243d2] border-b-2 border-[#a243d2]"
+              : "text-gray-500"
+          }`}
+          onClick={() => setActiveTab("clients")}
+        >
+          Clientes
+        </button>
+        <button
+          className={`py-2 px-4 font-medium ${
             activeTab === "vendedores"
               ? "text-[#a243d2] border-b-2 border-[#a243d2]"
               : "text-gray-500"
@@ -328,6 +491,56 @@ const SettingsPage = () => {
           Vendedores
         </button>
       </div>
+
+      {activeTab === "clients" && (
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Gerenciamento de Clientes</h2>
+            <Buttons onClick={() => {
+              setCurrentClient(null);
+              setClientForm({ nome: "", email: "", telefone: "" });
+              setIsClientModalOpen(true);
+            }}>
+              Adicionar Cliente
+            </Buttons>
+          </div>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {clientes.map((client) => (
+                  <tr key={client.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">{client.nome}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{client.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{client.telefone}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => handleEditClient(client)}
+                        className="text-[#a243d2] hover:text-[#580581] mr-3"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClient(client.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {activeTab === "profile" && (
         <div className="bg-white rounded-lg shadow p-6">
@@ -420,7 +633,11 @@ const SettingsPage = () => {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Gerenciamento de Usuários</h2>
-            <Buttons onClick={() => setIsUserModalOpen(true)}>
+            <Buttons onClick={() => {
+              setCurrentUser(null);
+              setUserForm({ nome: "", email: "", senha: "", papel: "user" });
+              setIsUserModalOpen(true);
+            }}>
               Adicionar Usuário
             </Buttons>
           </div>
@@ -483,7 +700,11 @@ const SettingsPage = () => {
             <h2 className="text-xl font-semibold">
               Gerenciamento de Vendedores
             </h2>
-            <Buttons onClick={() => setIsVendedorModalOpen(true)}>
+            <Buttons onClick={() => {
+              setCurrentVendedor(null);
+              setVendedorForm({ nome: "", filialId: "" });
+              setIsVendedorModalOpen(true);
+            }}>
               Adicionar Vendedor
             </Buttons>
           </div>
