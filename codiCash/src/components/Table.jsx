@@ -18,25 +18,25 @@ const Table = ({ data, columns, renderActions }) => {
                 className={
                   column === "Modalidade"
                     ? row[column] === "Presencial"
-                      ? "px-2 py-1 rounded-full bg-[#a243d2] text-white font-semibold"
-                      : "px-2 py-1 rounded-full bg-emerald-600 text-white font-semibold"
+                       ? "px-1.5 py-0.5 rounded-full bg-[#a243d2] text-white font-semibold text-sm"
+                       : "px-1.5 py-0.5 rounded-full bg-emerald-600 text-white font-semibold text-sm"
                     : column === "Pagamento"
                     ? row[column] === "PIX"
-                      ? "px-2 py-1 rounded-full bg-emerald-500 text-white font-semibold"
-                      : "px-2 py-1 rounded-full bg-blue-700 text-white font-semibold"
+                       ? "px-1.5 py-0.5 rounded-full bg-emerald-500 text-white font-semibold text-sm"
+                       : "px-1.5 py-0.5 rounded-full bg-blue-700 text-white font-semibold text-sm"
                     : column === "Status"
                     ? row[column] === "Pago"
-                      ? "px-2 py-1 rounded-full bg-emerald-500 text-white font-semibold"
-                      : row[column] === "Pendente"
-                      ? "px-2 py-1 rounded-full bg-orange-400 text-white font-semibold"
-                      : "px-2 py-1 rounded-full bg-gray-400 text-white font-semibold"
+                       ? "px-1.5 py-0.5 rounded-full bg-emerald-500 text-white font-semibold text-sm"
+                       : row[column] === "Pendente"
+                       ? "px-1.5 py-0.5 rounded-full bg-orange-400 text-white font-semibold text-sm"
+                       : "px-1.5 py-0.5 rounded-full bg-gray-400 text-white font-semibold text-sm"
                     : "text-center"
                 }
               >
                 {row[column]}
               </td>
             ))}
-            {renderActions && <td>{renderActions(row)}</td>}
+                {renderActions && <td className="px-4 py-2 text-center align-middle" style={{ minWidth: 160 }}>{renderActions(row)}</td>}
           </tr>
         ))}
       </tbody>

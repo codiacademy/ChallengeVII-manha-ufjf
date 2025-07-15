@@ -1,14 +1,67 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "../components/Table";
-import { useNavigate } from "react-router-dom";
 import { SquarePlus } from "lucide-react";
+import { Funnel } from 'lucide-react';
 import Buttons from "../components/Buttons";
+
+// Colocar lógica de parcelas, desconto, impostos, etc
 
 function getNextId(array) {
   if (!array || array.length === 0) return "1";
   const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
   return String(maxId + 1);
 }
+
+
+// Componente de busca/filtro para despesas
+function SearchFilterExpenses({ data, columns, setFilteredData, selectedField }) {
+  const [localSearch, setLocalSearch] = React.useState("");
+
+  const handleSearch = () => {
+    if (!localSearch.trim()) {
+      setFilteredData(data);
+      return;
+    }
+    const lower = localSearch.toLowerCase();
+    setFilteredData(
+      data.filter((row) => {
+        if (selectedField && columns.includes(selectedField)) {
+          return String(row[selectedField] || "").toLowerCase().includes(lower);
+        } else {
+          return columns.some((col) => String(row[col] || "").toLowerCase().includes(lower));
+        }
+      })
+    );
+  };
+
+  const handleClearSearch = () => {
+    setLocalSearch("");
+    setFilteredData(data);
+  };
+
+  return (
+    <div className="flex flex-row gap-2 items-center w-full mb-2">
+      <input
+        type="text"
+        placeholder="Buscar..."
+        className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] placeholder-[#a243d2] bg-transparent"
+        value={localSearch}
+        onChange={e => setLocalSearch(e.target.value)}
+      />
+      <button
+        className="px-3 py-1 rounded bg-[#a243d2] text-white font-semibold border border-[#a243d2] hover:bg-[#580581]"
+        onClick={handleSearch}
+        type="button"
+      >Buscar</button>
+      <button
+        className="px-3 py-1 rounded bg-gray-200 text-[#a243d2] font-semibold border border-[#a243d2] ml-1 hover:bg-gray-300"
+        onClick={handleClearSearch}
+        type="button"
+      >Limpar</button>
+    </div>
+  );
+}
+
 
 const ExpensesPage = () => {
   const [data, setData] = useState([]);
@@ -31,6 +84,15 @@ const ExpensesPage = () => {
   const [tiposDespesas, setTiposDespesas] = useState([]);
   const [filiais, setFiliais] = useState([]);
   const [categoriasDespesas, setCategoriasDespesas] = useState([]);
+  // Busca e filtro
+  const [filteredData, setFilteredData] = useState([]);
+  // Modal filtro
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [selectedField, setSelectedField] = useState("");
+
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
 
   useEffect(() => {
     fetch("http://localhost:3001/status")
@@ -139,16 +201,22 @@ const ExpensesPage = () => {
     const despesaOriginal = despesasOriginais.find((d) => d.id === selectedRow.id);
     if (!despesaOriginal) return;
 
+    // Atualiza todos os campos editáveis
+    const despesaAtualizada = {
+      ...despesaOriginal,
+      valor: Number(editValor),
+      statusId: editStatus,
+      data_despesa: selectedRow.data_despesa || despesaOriginal.data_despesa,
+      descricao: selectedRow.Descrição || despesaOriginal.descricao,
+    };
+
     await fetch(`http://localhost:3001/despesas/${selectedRow.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...despesaOriginal,
-        valor: Number(editValor),
-        statusId: editStatus,
-      }),
+      body: JSON.stringify(despesaAtualizada),
     });
 
+    // Atualiza tabela exibida
     setData((prev) =>
       prev.map((item) =>
         item.id === selectedRow.id
@@ -158,6 +226,10 @@ const ExpensesPage = () => {
                 minimumFractionDigits: 2,
               })}`,
               Status: statusMap[editStatus] || editStatus,
+              data_despesa: despesaAtualizada.data_despesa,
+              Descrição: despesaAtualizada.descricao,
+              valor: Number(editValor),
+              statusId: editStatus,
             }
           : item
       )
@@ -198,11 +270,12 @@ const ExpensesPage = () => {
       valor: Number(form.valor),
       data_despesa: form.data_despesa || new Date().toISOString(),
     };
-    await fetch("http://localhost:3001/despesas", {
+    const response = await fetch("http://localhost:3001/despesas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(novaDespesa),
     });
+    const despesaSalva = await response.json();
     setShowNewExpenseModal(false);
     setForm({
       tipoDespesaId: "",
@@ -212,7 +285,7 @@ const ExpensesPage = () => {
       data_despesa: "",
       descricao: "",
     });
-    setData((prev) => [...prev, novaDespesa]);
+    setData((prev) => [...prev, despesaSalva]);
   };
 
   useEffect(() => {
@@ -226,6 +299,8 @@ const ExpensesPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNewExpenseModal]);
 
+
+
   return (
     <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
       <div className="w-full max-w-5xl flex flex-col items-center">
@@ -235,139 +310,204 @@ const ExpensesPage = () => {
         <p className="text-[#a243d2] text-lg mb-6 w-full text-left">
           Lançamento e gerenciamento de despesas fixas e variáveis
         </p>
-        <div className="flex flex-row gap-2 mb-4 w-full">
+        <div className="flex flex-row items-center justify-end w-full mb-4 gap-2">
           <button className="px-4 py-2 rounded-full bg-[#e9e0f7] text-[#a243d2] font-semibold border border-[#a243d2] shadow-sm">
             Despesas fixas
           </button>
           <button className="px-4 py-2 rounded-full bg-[#e9e0f7] text-[#a243d2] font-semibold border border-[#a243d2] shadow-sm opacity-60">
             Despesas Variáveis
           </button>
-          <div className="flex-1" />
+          <button
+            className="flex items-center gap-2 px-3 py-1 rounded bg-transparent border border-[#a243d2] text-[#a243d2] hover:bg-[#e9e0f7] ml-4"
+            onClick={() => setShowFilterModal(!showFilterModal)}
+            type="button"
+            style={{ minWidth: 40 }}
+          >
+            <Funnel />
+          </button>
+          {showFilterModal && (
+            <select
+              className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] bg-transparent"
+              value={selectedField}
+              onChange={e => setSelectedField(e.target.value)}
+              style={{ minWidth: 140 }}
+            >
+              <option value="">Todos os campos</option>
+              {columns.map((col) => (
+                <option key={col} value={col}>{col}</option>
+              ))}
+            </select>
+          )}
+          <div className="flex flex-row gap-2 items-center" style={{ minWidth: 320 }}>
+            <SearchFilterExpenses
+              data={data}
+              columns={columns}
+              setFilteredData={setFilteredData}
+              selectedField={selectedField}
+            />
+          </div>
           <Buttons
-            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm"
+            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm ml-4"
             onClick={() => setShowNewExpenseModal(true)}
+            style={{ marginLeft: 'auto' }}
           >
             <SquarePlus size={18} />
             <span>Nova Despesa</span>
           </Buttons>
         </div>
-        <div className="flex flex-row justify-end w-full mb-2">
-          <input
-            className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] placeholder-[#a243d2] bg-transparent"
-            placeholder="Buscar"
-          />
-        </div>
         <div className="bg-white rounded-2xl shadow-lg p-0 w-full border-2 border-[#a243d2]">
           <Table
-            data={data}
+            data={filteredData}
             columns={columns}
             renderActions={(row) => (
-              <button
-                className="text-xl px-2 rounded hover:bg-[#f3f8fc]"
-                onClick={(e) => handleOpenPopover(row, e)}
-                title="Ações"
-              >
-                &#8942;
-              </button>
+              <div className="flex justify-center items-center gap-3 mx-2">
+                <button
+                  className="px-3 py-1 rounded bg-[#a243d2] text-white hover:bg-[#580581] font-semibold"
+                  onClick={e => {
+                    setSelectedRow(row);
+                    setEditValor(row.valor);
+                    setEditStatus(statusList.find((s) => s.nome === row.Status)?.id || "");
+                    setShowEditForm(true);
+                    // Posiciona o modal junto ao botão
+                    const rect = e.target.getBoundingClientRect();
+                    setPopoverPos({
+                      top: rect.bottom + window.scrollY,
+                      left: rect.left + window.scrollX,
+                    });
+                  }}
+                  title="Editar"
+                  style={{ minWidth: 70, textAlign: 'center' }}
+                >
+                  Editar
+                </button>
+                <button
+                  className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-700 font-semibold"
+                  onClick={() => {
+                    if(window.confirm('Tem certeza que deseja excluir esta despesa?')) {
+                      setSelectedRow(row);
+                      handleDelete();
+                    }
+                  }}
+                  title="Excluir"
+                  style={{ minWidth: 70, textAlign: 'center' }}
+                >
+                  Excluir
+                </button>
+              </div>
             )}
           />
         </div>
+
         <div className="w-full flex justify-end mt-2">
           <span className="text-[#a243d2] text-sm cursor-pointer hover:underline">
             Mostrar mais
           </span>
         </div>
       </div>
-      {showPopover && selectedRow && (
-        <div
-          ref={popoverRef}
-          style={{
-            position: "absolute",
-            top: popoverPos.top,
-            left: popoverPos.left,
-            zIndex: 1000,
-            background: "white",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            minWidth: "150px",
-            padding: "8px",
-          }}
-        >
-          <button
-            className="flex items-center gap-2 w-full text-left mb-2 text-[#a243d2] hover:bg-[#f3f8fc] px-2 py-1 rounded"
-          >
-            <span role="img" aria-label="Visualizar">👁️</span> Visualizar
-          </button>
-          <button
-            className="flex items-center gap-2 w-full text-left mb-2 text-[#a243d2] hover:bg-[#f3f8fc] px-2 py-1 rounded"
-            onClick={handleEdit}
-          >
-            <span role="img" aria-label="Editar">✏️</span> Editar
-          </button>
-          <button
-            className="flex items-center gap-2 w-full text-left text-red-600 hover:bg-red-50 px-2 py-1 rounded"
-            onClick={handleDelete}
-          >
-            <span role="img" aria-label="Excluir">🗑️</span> Excluir
-          </button>
-        </div>
-      )}
+      {/* Modal de edição permanece, mas o popover de ações foi removido */}
       {showEditForm && selectedRow && (
-        <div
-          ref={popoverRef}
-          style={{
-            position: "absolute",
-            top: popoverPos.top,
-            left: popoverPos.left,
-            zIndex: 1000,
-            background: "white",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            minWidth: "220px",
-            padding: "12px",
-          }}
-        >
-          <div className="mb-2">
-            <label className="block text-sm">Valor:</label>
-            <input
-              type="number"
-              value={editValor}
-              onChange={(e) => setEditValor(e.target.value)}
-              className="border p-1 w-full rounded"
-            />
-          </div>
-          <div className="mb-2">
-            <label className="block text-sm">Status:</label>
-            <select
-              value={editStatus}
-              onChange={(e) => setEditStatus(e.target.value)}
-              className="border p-1 w-full rounded"
-            >
-              <option value="">Selecione</option>
-              {statusList.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            className="block w-full text-left text-green-600 mb-2"
-            onClick={handleSaveEdit}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
+          <div
+            ref={popoverRef}
+            className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
+            style={{ minWidth: 320 }}
           >
-            Salvar
-          </button>
-          <button
-            className="block w-full text-left text-gray-600"
-            onClick={() => {
-              setShowEditForm(false);
-              setSelectedRow(null);
-            }}
-          >
-            Cancelar
-          </button>
+            <form onSubmit={e => { e.preventDefault(); handleSaveEdit(); }} className="flex flex-col gap-3">
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">Data:</label>
+                <input
+                  type="date"
+                  value={selectedRow.data_despesa ? selectedRow.data_despesa.slice(0,10) : ""}
+                  onChange={e => setSelectedRow({ ...selectedRow, data_despesa: e.target.value })}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">Categoria:</label>
+                <select
+                  value={selectedRow.Categoria || ""}
+                  onChange={e => setSelectedRow({ ...selectedRow, Categoria: e.target.value })}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                >
+                  <option value="">Selecione</option>
+                  {categoriasDespesas.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">Filial:</label>
+                <select
+                  value={selectedRow.Filial || ""}
+                  onChange={e => setSelectedRow({ ...selectedRow, Filial: e.target.value })}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                >
+                  <option value="">Selecione</option>
+                  {filiais.map((f) => (
+                    <option key={f.id} value={f.id}>{f.nome}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">Descrição:</label>
+                <input
+                  type="text"
+                  value={selectedRow.Descrição || ""}
+                  onChange={e => setSelectedRow({ ...selectedRow, Descrição: e.target.value })}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">Valor:</label>
+                <input
+                  type="number"
+                  value={editValor}
+                  onChange={e => setEditValor(e.target.value)}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">Pagamento:</label>
+                <input
+                  type="text"
+                  value={selectedRow.Pagamento || ""}
+                  onChange={e => setSelectedRow({ ...selectedRow, Pagamento: e.target.value })}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">Status:</label>
+                <select
+                  value={editStatus}
+                  onChange={e => setEditStatus(e.target.value)}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                  required
+                >
+                  <option value="">Selecione</option>
+                  {statusList.map((s) => (
+                    <option key={s.id} value={s.id}>{s.nome}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="block w-full text-left text-green-600 mb-2"
+              >
+                Salvar
+              </button>
+              <button
+                type="button"
+                className="block w-full text-left text-gray-600"
+                onClick={() => {
+                  setShowEditForm(false);
+                  setSelectedRow(null);
+                }}
+              >
+                Cancelar
+              </button>
+            </form>
+          </div>
         </div>
       )}
       {/* Modal Nova Despesa */}
