@@ -5,18 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "json-server --watch db.json --port 3001",
+    "server": "json-server --watch db.json --port 3001 --routes routes.json",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.7",
+    "html-to-image": "^1.11.13",
+    "json-server": "^0.17.4",
     "lucide-react": "^0.513.0",
     "react": "^19.1.0",
+    "react-colorful": "^5.6.1",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.1",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.0.2",
     "tailwindcss": "^4.1.7"
   },
   "devDependencies": {

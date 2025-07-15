@@ -171,5 +171,166 @@
       "data_criacao": "2025-05-01T12:30:00Z",
       "data_atualizacao": "2025-05-01T12:30:00Z"
     }
-  ]
+  ],
+  "graficos": [
+    {
+      "title": "Venda de curso",
+      "type": "bar",
+      "data": [
+        {
+          "id": "1",
+          "clienteId": "1",
+          "cursoId": "1",
+          "vendedorId": "1",
+          "tipoPagamentoId": "1",
+          "statusId": "1",
+          "valorBruto": 2700,
+          "desconto": 0,
+          "impostos": 100,
+          "comissao": 150,
+          "taxaCartao": 50,
+          "parcelas": 1,
+          "valorTotal": 2600,
+          "data_venda": "2025-05-01T12:00:00Z",
+          "data_criacao": "2025-05-01T12:00:00Z",
+          "data_atualizacao": "2025-05-01T12:00:00Z",
+          "clienteId_label": "João Silva",
+          "cursoId_label": "Full Stack",
+          "vendedorId_label": "Clarissa",
+          "tipoPagamentoId_label": "Cartão",
+          "statusId_label": "Pago"
+        }
+      ],
+      "dataKeys": [
+        "valorBruto"
+      ],
+      "xAxisKey": "cursoId_label",
+      "width": 600,
+      "height": 400,
+      "colors": [
+        "#3B82F6",
+        "#8B5CF6",
+        "#06B6D4",
+        "#10B981",
+        "#F97316",
+        "#EF4444"
+      ],
+      "showLegend": true,
+      "legendPosition": "bottom",
+      "showGrid": true,
+      "showTooltip": true,
+      "dateCreated": 1752524270630,
+      "dataSource": "vendas",
+      "relationsData": {
+        "clienteId": {
+          "1": "João Silva"
+        },
+        "cursoId": {
+          "1": "Full Stack"
+        },
+        "vendedorId": {
+          "1": "Clarissa"
+        },
+        "tipoPagamentoId": {
+          "1": "Cartão",
+          "2": "PIX"
+        },
+        "statusId": {
+          "1": "Pago",
+          "2": "Pendente",
+          "3": "Cancelado"
+        }
+      },
+      "id": "1"
+    },
+    {
+      "id": "1752525206651",
+      "title": "Comisão x Valor de venda",
+      "type": "bar",
+      "data": [
+        {
+          "id": "1",
+          "clienteId": "1",
+          "cursoId": "1",
+          "vendedorId": "1",
+          "tipoPagamentoId": "1",
+          "statusId": "1",
+          "valorBruto": 2700,
+          "desconto": 0,
+          "impostos": 100,
+          "comissao": 150,
+          "taxaCartao": 50,
+          "parcelas": 1,
+          "valorTotal": 2600,
+          "data_venda": "2025-05-01T12:00:00Z",
+          "data_criacao": "2025-05-01T12:00:00Z",
+          "data_atualizacao": "2025-05-01T12:00:00Z",
+          "clienteId_label": "João Silva",
+          "cursoId_label": "Full Stack",
+          "vendedorId_label": "Clarissa",
+          "tipoPagamentoId_label": "Cartão",
+          "statusId_label": "Pago"
+        }
+      ],
+      "dataKeys": [
+        "comissao",
+        "valorTotal"
+      ],
+      "xAxisKey": "vendedorId_label",
+      "width": 600,
+      "height": 400,
+      "colors": [
+        "#029f51",
+        "#b4da0e",
+        "#06B6D4",
+        "#10B981",
+        "#F97316",
+        "#EF4444"
+      ],
+      "showLegend": true,
+      "legendPosition": "bottom",
+      "showGrid": false,
+      "showTooltip": true,
+      "dateCreated": 1752525136072,
+      "dataSource": "vendas",
+      "relationsData": {
+        "clienteId": {
+          "1": "João Silva"
+        },
+        "cursoId": {
+          "1": "Full Stack"
+        },
+        "vendedorId": {
+          "1": "Clarissa"
+        },
+        "tipoPagamentoId": {
+          "1": "Cartão",
+          "2": "PIX"
+        },
+        "statusId": {
+          "1": "Pago",
+          "2": "Pendente",
+          "3": "Cancelado"
+        }
+      }
+    }
+  ],
+  "dashboard": {
+    "layout": [
+      {
+        "chartId": "1",
+        "x": 0,
+        "y": 201,
+        "width": 867,
+        "height": 581
+      },
+      {
+        "chartId": "1752525206651",
+        "x": 798,
+        "y": 27,
+        "width": 446,
+        "height": 405
+      }
+    ]
+  }
 }
