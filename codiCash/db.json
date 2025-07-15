@@ -149,6 +149,8 @@
       "vendedorId": "1",
       "tipoPagamentoId": "1",
       "statusId": "1",
+      "filialId": "1",
+      "modalidadeId": "1",
       "valorBruto": 2700,
       "desconto": 0,
       "impostos": 100,
