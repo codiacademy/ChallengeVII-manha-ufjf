@@ -702,17 +702,43 @@ const ExpensesPage = () => {
             <div className="flex flex-col gap-2">
               {Object.entries(viewRow)
                 .filter(
-                  ([key]) => !key.toLowerCase().includes("id") && key !== "id"
-                ) // Filtra apenas campos de ID
-                .map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex justify-between py-1 border-b border-gray-100"
-                  >
-                    <span className="font-semibold text-[#a243d2]">{key}:</span>
-                    <span className="text-gray-700">{String(value)}</span>
-                  </div>
-                ))}
+                  ([key]) =>
+                    !key.toLowerCase().includes("id") &&
+                    key !== "id" &&
+                    key !== "valor" && // Remover campo de valor bruto
+                    key !== "data_despesa" // Remover campo de data original
+                )
+                .map(([key, value]) => {
+                  // Formatar a data para dia/mês/ano
+                  if (key === "Data") {
+                    return (
+                      <div
+                        key={key}
+                        className="flex justify-between py-1 border-b border-gray-100"
+                      >
+                        <span className="font-semibold text-[#a243d2]">
+                          {key}:
+                        </span>
+                        <span className="text-gray-700">
+                          {new Date(viewRow.data_despesa).toLocaleDateString(
+                            "pt-BR"
+                          )}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div
+                      key={key}
+                      className="flex justify-between py-1 border-b border-gray-100"
+                    >
+                      <span className="font-semibold text-[#a243d2]">
+                        {key}:
+                      </span>
+                      <span className="text-gray-700">{String(value)}</span>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>

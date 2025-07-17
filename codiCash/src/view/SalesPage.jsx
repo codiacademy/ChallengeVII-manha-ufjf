@@ -92,11 +92,26 @@ const SalesPage = () => {
   const [filiais, setFiliais] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [tiposPagamento, setTiposPagamento] = useState([]);
+  const [editDesconto, setEditDesconto] = useState(0);
+  const [editComissao, setEditComissao] = useState(0);
+  const [editTaxaCartao, setEditTaxaCartao] = useState(0);
 
   // Filtro
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedField, setSelectedField] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+
+  const calcularValorTotal = (
+    cursoPreco,
+    desconto,
+    comissao,
+    tipoPagamentoId
+  ) => {
+    const valorBase = cursoPreco - desconto + comissao;
+    const impostos = valorBase * 0.08;
+    const taxaCartao = tipoPagamentoId === "1" ? valorBase * 0.03 : 0;
+    return valorBase + impostos + taxaCartao;
+  };
 
   // Modal Nova Venda fecha ao clicar fora
   useEffect(() => {
@@ -221,8 +236,6 @@ const SalesPage = () => {
   const [form, setForm] = useState({
     clienteId: "",
     cursoId: "",
-    modalidadeId: "",
-    valorTotal: "",
     filialId: "",
     vendedorId: "",
     tipoPagamentoId: "",
@@ -230,16 +243,51 @@ const SalesPage = () => {
     data_venda: "",
   });
 
+  useEffect(() => {
+    if (form.cursoId) {
+      const cursoSelecionado = cursos.find((c) => c.id === form.cursoId);
+      if (cursoSelecionado) {
+        const valorTotal = calcularValorTotal(
+          cursoSelecionado.preco,
+          form.desconto || 0,
+          form.comissao || 0,
+          form.tipoPagamentoId
+        );
+        setForm((prev) => ({
+          ...prev,
+          valorTotal: valorTotal,
+          modalidadeId: cursoSelecionado.modalidadeId,
+        }));
+      }
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        valorTotal: "",
+        modalidadeId: "",
+      }));
+    }
+  }, [form.cursoId, form.desconto, form.tipoPagamentoId, cursos]);
+
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleNewSaleSubmit = async (e) => {
     e.preventDefault();
+    const cursoSelecionado = cursos.find((c) => c.id === form.cursoId);
+    const valorTotal = calcularValorTotal(
+      cursoSelecionado?.preco || selectedRow.valorTotal,
+      editDesconto,
+      editComissao,
+      selectedRow.tipoPagamentoId
+    );
+
     const novaVenda = {
       ...form,
       id: getNextId(data),
-      valorTotal: Number(form.valorTotal),
+      valorTotal: Number(valorTotal),
+      desconto: Number(form.desconto || 0),
+      comissao: Number(form.comissao || 0),
       data_venda: form.data_venda || new Date().toISOString(),
     };
     await fetch("http://localhost:3001/vendas", {
@@ -328,6 +376,8 @@ const SalesPage = () => {
     setSelectedRow(row);
     setEditValor(row.valorTotal);
     setEditStatus(row.statusId);
+    setEditDesconto(row.desconto || 0);
+    setEditComissao(row.comissao || 0);
     setShowEditForm(true);
   };
 
@@ -335,10 +385,19 @@ const SalesPage = () => {
     const vendaOriginal = vendasOriginais.find((v) => v.id === selectedRow.id);
     if (!vendaOriginal) return;
 
+    const cursoSelecionado = cursos.find((c) => c.id === selectedRow.cursoId);
+    const valorTotal = calcularValorTotal(
+      cursoSelecionado?.preco || selectedRow.valorTotal,
+      editDesconto,
+      selectedRow.tipoPagamentoId
+    );
+
     const vendaAtualizada = {
       ...vendaOriginal,
-      valorTotal: Number(editValor),
+      valorTotal: Number(valorTotal),
       statusId: editStatus,
+      desconto: Number(editDesconto),
+      comissao: Number(editComissao),
       modalidadeId: selectedRow.modalidadeId,
       tipoPagamentoId: selectedRow.tipoPagamentoId,
       vendedorId: selectedRow.vendedorId,
@@ -563,9 +622,27 @@ const SalesPage = () => {
                 </label>
                 <select
                   value={selectedRow.cursoId || ""}
-                  onChange={(e) =>
-                    setSelectedRow({ ...selectedRow, cursoId: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const novoCursoId = e.target.value;
+                    const cursoSelecionado = cursos.find(
+                      (c) => c.id === novoCursoId
+                    );
+                    setSelectedRow((prev) => ({
+                      ...prev,
+                      cursoId: novoCursoId,
+                      modalidadeId: cursoSelecionado
+                        ? cursoSelecionado.modalidadeId
+                        : prev.modalidadeId,
+                      valorTotal: cursoSelecionado
+                        ? cursoSelecionado.preco
+                        : prev.valorTotal,
+                    }));
+                    setEditValor(
+                      cursoSelecionado
+                        ? cursoSelecionado.preco
+                        : prev.valorTotal
+                    );
+                  }}
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
@@ -576,39 +653,31 @@ const SalesPage = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Exibição da Modalidade (somente leitura) */}
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Modalidade:
                 </label>
-                <select
-                  value={selectedRow.modalidadeId || ""}
-                  onChange={(e) =>
-                    setSelectedRow({
-                      ...selectedRow,
-                      modalidadeId: e.target.value,
-                    })
-                  }
-                  className="border border-[#a243d2] p-1 w-full rounded"
-                >
-                  <option value="">Selecione</option>
-                  {modalidades.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.tipo}
-                    </option>
-                  ))}
-                </select>
+                <div className="border border-[#a243d2] p-1 w-full rounded bg-gray-100">
+                  {modalidades.find((m) => m.id === selectedRow.modalidadeId)
+                    ?.tipo || "Modalidade não definida"}
+                </div>
               </div>
+
+              {/* Exibição do Valor (somente leitura) */}
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Valor:
                 </label>
-                <input
-                  type="number"
-                  value={editValor}
-                  onChange={(e) => setEditValor(e.target.value)}
-                  className="border border-[#a243d2] p-1 w-full rounded"
-                  required
-                />
+                <div className="border border-[#a243d2] p-1 w-full rounded bg-gray-100">
+                  R${" "}
+                  {selectedRow.valorTotal
+                    ? Number(selectedRow.valorTotal).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })
+                    : "0,00"}
+                </div>
               </div>
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
@@ -767,29 +836,58 @@ const SalesPage = () => {
                   </option>
                 ))}
               </select>
-              <select
-                name="modalidadeId"
-                value={form.modalidadeId}
-                onChange={handleFormChange}
-                className="border rounded p-2"
-                required
-              >
-                <option value="">Selecione a Modalidade</option>
-                {modalidades.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.tipo}
-                  </option>
-                ))}
-              </select>
-              <input
-                className="border rounded p-2"
-                name="valorTotal"
-                placeholder="Valor"
-                type="number"
-                value={form.valorTotal}
-                onChange={handleFormChange}
-                required
-              />
+              <div className="border rounded p-2 bg-gray-100">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Modalidade:
+                </label>
+                <div className="text-lg font-semibold">
+                  {form.modalidadeId
+                    ? modalidades.find((m) => m.id === form.modalidadeId)
+                        ?.tipo || "Modalidade não encontrada"
+                    : "Selecione um curso"}
+                </div>
+              </div>
+              {/* Campo de desconto CORRIGIDO */}
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Desconto (R$):
+                </label>
+                <input
+                  type="number"
+                  name="desconto"
+                  value={form.desconto || 0}
+                  onChange={handleFormChange}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                />
+              </div>
+
+              {/* Campo de comissão CORRIGIDO */}
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Comissão (R$):
+                </label>
+                <input
+                  type="number"
+                  name="comissao"
+                  value={form.comissao || 0}
+                  onChange={handleFormChange}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                />
+              </div>
+
+              {/* Exibição do valor calculado */}
+              <div className="border rounded p-2 bg-gray-100">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Valor Total:
+                </label>
+                <div className="text-lg font-semibold">
+                  {form.valorTotal
+                    ? `R$ ${Number(form.valorTotal).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })}`
+                    : "Selecione um curso"}
+                </div>
+              </div>
               <select
                 name="filialId"
                 value={form.filialId}
@@ -869,19 +967,70 @@ const SalesPage = () => {
               Detalhes da Venda
             </h3>
             <div className="flex flex-col gap-2">
-              {Object.entries(viewRow)
-                .filter(
-                  ([key]) => !key.toLowerCase().includes("id") && key !== "id"
-                ) // Filtra apenas campos de ID
-                .map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex justify-between py-1 border-b border-gray-100"
-                  >
-                    <span className="font-semibold text-[#a243d2]">{key}:</span>
-                    <span className="text-gray-700">{String(value)}</span>
-                  </div>
-                ))}
+              {/* Adicionar campos específicos */}
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Data:</span>
+                <span className="text-gray-700">{viewRow.Data}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Cliente:</span>
+                <span className="text-gray-700">{viewRow.Cliente}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Curso:</span>
+                <span className="text-gray-700">{viewRow.Curso}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Valor:</span>
+                <span className="text-gray-700">{viewRow.Valor}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Desconto:</span>
+                <span className="text-gray-700">
+                  R${" "}
+                  {viewRow.desconto
+                    ? Number(viewRow.desconto).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })
+                    : "0,00"}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Comissão:</span>
+                <span className="text-gray-700">
+                  R${" "}
+                  {viewRow.comissao
+                    ? Number(viewRow.comissao).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })
+                    : "0,00"}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Filial:</span>
+                <span className="text-gray-700">{viewRow.Filial}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Vendedor:</span>
+                <span className="text-gray-700">{viewRow.Vendedor}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Pagamento:</span>
+                <span className="text-gray-700">{viewRow.Pagamento}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Status:</span>
+                <span className="text-gray-700">{viewRow.Status}</span>
+              </div>
             </div>
           </div>
         </div>
