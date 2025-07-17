@@ -102,6 +102,10 @@ const ExpensesPage = () => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedField, setSelectedField] = useState("");
 
+  // Novo estado para modal de visualização
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewRow, setViewRow] = useState(null);
+
   useEffect(() => {
     setFilteredData(data);
   }, [data]);
@@ -388,6 +392,10 @@ const ExpensesPage = () => {
                 <button
                   className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                   title="Visualizar"
+                  onClick={() => {
+                    setViewRow(row);
+                    setShowViewModal(true);
+                  }}
                 >
                   <Eye size={18} />
                 </button>
@@ -675,6 +683,37 @@ const ExpensesPage = () => {
                 Salvar
               </button>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Modal Visualizar Despesa */}
+      {showViewModal && viewRow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
+          <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg border-2 border-[#a243d2] relative">
+            <button
+              className="absolute top-2 right-4 text-2xl text-[#a243d2] font-bold"
+              onClick={() => setShowViewModal(false)}
+            >
+              ×
+            </button>
+            <h3 className="text-2xl font-bold text-[#a243d2] mb-4">
+              Detalhes da Despesa
+            </h3>
+            <div className="flex flex-col gap-2">
+              {Object.entries(viewRow)
+                .filter(
+                  ([key]) => !key.toLowerCase().includes("id") && key !== "id"
+                ) // Filtra apenas campos de ID
+                .map(([key, value]) => (
+                  <div
+                    key={key}
+                    className="flex justify-between py-1 border-b border-gray-100"
+                  >
+                    <span className="font-semibold text-[#a243d2]">{key}:</span>
+                    <span className="text-gray-700">{String(value)}</span>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       )}
