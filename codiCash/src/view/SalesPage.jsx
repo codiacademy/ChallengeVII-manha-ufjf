@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "../components/Table";
-import { SquarePlus, Funnel } from "lucide-react";
+import { SquarePlus, Funnel, Eye, Trash2, PenLine } from "lucide-react";
 import Buttons from "../components/Buttons";
 
 // Função utilitária para IDs sequenciais
 function getNextId(array) {
   if (!array || array.length === 0) return "1";
-  const maxId = Math.max(...array.map(item => Number(item.id) || 0));
+  const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
   return String(maxId + 1);
 }
 
@@ -23,9 +23,15 @@ function SearchFilterSales({ data, columns, setFilteredData, selectedField }) {
     setFilteredData(
       data.filter((row) => {
         if (selectedField && columns.includes(selectedField)) {
-          return String(row[selectedField] || "").toLowerCase().includes(lower);
+          return String(row[selectedField] || "")
+            .toLowerCase()
+            .includes(lower);
         } else {
-          return columns.some((col) => String(row[col] || "").toLowerCase().includes(lower));
+          return columns.some((col) =>
+            String(row[col] || "")
+              .toLowerCase()
+              .includes(lower)
+          );
         }
       })
     );
@@ -43,18 +49,22 @@ function SearchFilterSales({ data, columns, setFilteredData, selectedField }) {
         placeholder="Buscar..."
         className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] placeholder-[#a243d2] bg-transparent"
         value={localSearch}
-        onChange={e => setLocalSearch(e.target.value)}
+        onChange={(e) => setLocalSearch(e.target.value)}
       />
       <button
         className="px-3 py-1 rounded bg-[#a243d2] text-white font-semibold border border-[#a243d2] hover:bg-[#580581]"
         onClick={handleSearch}
         type="button"
-      >Buscar</button>
+      >
+        Buscar
+      </button>
       <button
         className="px-3 py-1 rounded bg-gray-200 text-[#a243d2] font-semibold border border-[#a243d2] ml-1 hover:bg-gray-300"
         onClick={handleClearSearch}
         type="button"
-      >Limpar</button>
+      >
+        Limpar
+      </button>
     </div>
   );
 }
@@ -87,7 +97,7 @@ const SalesPage = () => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedField, setSelectedField] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  
+
   // Modal Nova Venda fecha ao clicar fora
   useEffect(() => {
     if (!showNewSaleModal) return;
@@ -160,7 +170,8 @@ const SalesPage = () => {
             clientesData.find((c) => c.id === venda.clienteId)?.nome ||
             venda.clienteId,
           Curso:
-            cursosData.find((c) => c.id === venda.cursoId)?.nome || venda.cursoId,
+            cursosData.find((c) => c.id === venda.cursoId)?.nome ||
+            venda.cursoId,
           Modalidade:
             modalidadesData.find((m) => m.id === venda.modalidadeId)?.tipo ||
             venda.modalidadeId,
@@ -174,8 +185,8 @@ const SalesPage = () => {
             vendedoresData.find((v) => v.id === venda.vendedorId)?.nome ||
             venda.vendedorId,
           Pagamento:
-            tiposPagamentoData.find((t) => t.id === venda.tipoPagamentoId)?.nome ||
-            venda.tipoPagamentoId,
+            tiposPagamentoData.find((t) => t.id === venda.tipoPagamentoId)
+              ?.nome || venda.tipoPagamentoId,
           Status:
             status.find((s) => s.id === venda.statusId)?.nome || venda.statusId,
           statusId: venda.statusId,
@@ -266,10 +277,9 @@ const SalesPage = () => {
         Vendedor:
           vendedores.find((v) => v.id === novaVenda.vendedorId)?.nome || "",
         Pagamento:
-          tiposPagamento.find((t) => t.id === novaVenda.tipoPagamentoId)?.nome ||
-          "",
-        Status:
-          statusList.find((s) => s.id === novaVenda.statusId)?.nome || "",
+          tiposPagamento.find((t) => t.id === novaVenda.tipoPagamentoId)
+            ?.nome || "",
+        Status: statusList.find((s) => s.id === novaVenda.statusId)?.nome || "",
         statusId: novaVenda.statusId,
         valorTotal: novaVenda.valorTotal,
         data_venda: novaVenda.data_venda,
@@ -297,10 +307,9 @@ const SalesPage = () => {
         Vendedor:
           vendedores.find((v) => v.id === novaVenda.vendedorId)?.nome || "",
         Pagamento:
-          tiposPagamento.find((t) => t.id === novaVenda.tipoPagamentoId)?.nome ||
-          "",
-        Status:
-          statusList.find((s) => s.id === novaVenda.statusId)?.nome || "",
+          tiposPagamento.find((t) => t.id === novaVenda.tipoPagamentoId)
+            ?.nome || "",
+        Status: statusList.find((s) => s.id === novaVenda.statusId)?.nome || "",
         statusId: novaVenda.statusId,
         valorTotal: novaVenda.valorTotal,
         data_venda: novaVenda.data_venda,
@@ -355,11 +364,11 @@ const SalesPage = () => {
               })}`,
               Status: statusMap[editStatus] || editStatus,
               Modalidade:
-                modalidades.find((m) => m.id === selectedRow.modalidadeId)?.tipo ||
-                selectedRow.modalidadeId,
+                modalidades.find((m) => m.id === selectedRow.modalidadeId)
+                  ?.tipo || selectedRow.modalidadeId,
               Pagamento:
-                tiposPagamento.find((t) => t.id === selectedRow.tipoPagamentoId)?.nome ||
-                selectedRow.tipoPagamentoId,
+                tiposPagamento.find((t) => t.id === selectedRow.tipoPagamentoId)
+                  ?.nome || selectedRow.tipoPagamentoId,
               Vendedor:
                 vendedores.find((v) => v.id === selectedRow.vendedorId)?.nome ||
                 selectedRow.vendedorId,
@@ -421,16 +430,21 @@ const SalesPage = () => {
             <select
               className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] bg-transparent"
               value={selectedField}
-              onChange={e => setSelectedField(e.target.value)}
+              onChange={(e) => setSelectedField(e.target.value)}
               style={{ minWidth: 140 }}
             >
               <option value="">Todos os campos</option>
               {columns.map((col) => (
-                <option key={col} value={col}>{col}</option>
+                <option key={col} value={col}>
+                  {col}
+                </option>
               ))}
             </select>
           )}
-          <div className="flex flex-row gap-2 items-center" style={{ minWidth: 320 }}>
+          <div
+            className="flex flex-row gap-2 items-center"
+            style={{ minWidth: 320 }}
+          >
             <SearchFilterSales
               data={data}
               columns={columns}
@@ -441,7 +455,7 @@ const SalesPage = () => {
           <Buttons
             className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm ml-4"
             onClick={() => setShowNewSaleModal(true)}
-            style={{ marginLeft: 'auto' }}
+            style={{ marginLeft: "auto" }}
           >
             <SquarePlus size={18} />
             <span>Nova Venda</span>
@@ -454,29 +468,28 @@ const SalesPage = () => {
             renderActions={(row) => (
               <div className="flex justify-center items-center gap-3 mx-2">
                 <button
-                  className="px-3 py-1 rounded bg-[#a243d2] text-white hover:bg-[#580581] font-semibold"
-                  onClick={() => handleEdit(row)}
-                  title="Editar"
-                  style={{ minWidth: 70, textAlign: 'center' }}
+                  className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                  title="Visualizar"
                 >
-                  Editar
+                  <Eye size={18} />
                 </button>
                 <button
-                  className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-700 font-semibold"
-                  onClick={() => handleDelete(row)}
-                  title="Excluir"
-                  style={{ minWidth: 70, textAlign: 'center' }}
+                  className="p-1.5 text-[#a243d2] hover:bg-purple-50 rounded-full transition-colors"
+                  title="Editar"
+                  onClick={() => handleEdit(row)}
                 >
-                  Excluir
+                  <PenLine size={18} />
+                </button>
+                <button
+                  className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                  title="Excluir"
+                  onClick={() => handleDelete(row)}
+                >
+                  <Trash2 size={18} />
                 </button>
               </div>
             )}
           />
-        </div>
-        <div className="w-full flex justify-end mt-2">
-          <span className="text-[#a243d2] text-sm cursor-pointer hover:underline">
-            Mostrar mais
-          </span>
         </div>
       </div>
       {/* Modal Editar Venda */}
@@ -487,115 +500,186 @@ const SalesPage = () => {
             className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
             style={{ minWidth: 320 }}
           >
-            <form onSubmit={e => { e.preventDefault(); handleSaveEdit(); }} className="flex flex-col gap-3">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSaveEdit();
+              }}
+              className="flex flex-col gap-3"
+            >
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Data:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Data:
+                </label>
                 <input
                   type="date"
-                  value={selectedRow.data_venda ? selectedRow.data_venda.slice(0,10) : ""}
-                  onChange={e => setSelectedRow({ ...selectedRow, data_venda: e.target.value })}
+                  value={
+                    selectedRow.data_venda
+                      ? selectedRow.data_venda.slice(0, 10)
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setSelectedRow({
+                      ...selectedRow,
+                      data_venda: e.target.value,
+                    })
+                  }
                   className="border border-[#a243d2] p-1 w-full rounded"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Cliente:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Cliente:
+                </label>
                 <select
                   value={selectedRow.clienteId || ""}
-                  onChange={e => setSelectedRow({ ...selectedRow, clienteId: e.target.value })}
+                  onChange={(e) =>
+                    setSelectedRow({
+                      ...selectedRow,
+                      clienteId: e.target.value,
+                    })
+                  }
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
                   {clientes.map((c) => (
-                    <option key={c.id} value={c.id}>{c.nome}</option>
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Curso:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Curso:
+                </label>
                 <select
                   value={selectedRow.cursoId || ""}
-                  onChange={e => setSelectedRow({ ...selectedRow, cursoId: e.target.value })}
+                  onChange={(e) =>
+                    setSelectedRow({ ...selectedRow, cursoId: e.target.value })
+                  }
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
                   {cursos.map((c) => (
-                    <option key={c.id} value={c.id}>{c.nome}</option>
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Modalidade:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Modalidade:
+                </label>
                 <select
                   value={selectedRow.modalidadeId || ""}
-                  onChange={e => setSelectedRow({ ...selectedRow, modalidadeId: e.target.value })}
+                  onChange={(e) =>
+                    setSelectedRow({
+                      ...selectedRow,
+                      modalidadeId: e.target.value,
+                    })
+                  }
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
                   {modalidades.map((m) => (
-                    <option key={m.id} value={m.id}>{m.tipo}</option>
+                    <option key={m.id} value={m.id}>
+                      {m.tipo}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Valor:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Valor:
+                </label>
                 <input
                   type="number"
                   value={editValor}
-                  onChange={e => setEditValor(e.target.value)}
+                  onChange={(e) => setEditValor(e.target.value)}
                   className="border border-[#a243d2] p-1 w-full rounded"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Filial:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Filial:
+                </label>
                 <select
                   value={selectedRow.filialId || ""}
-                  onChange={e => setSelectedRow({ ...selectedRow, filialId: e.target.value })}
+                  onChange={(e) =>
+                    setSelectedRow({ ...selectedRow, filialId: e.target.value })
+                  }
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
                   {filiais.map((f) => (
-                    <option key={f.id} value={f.id}>{f.nome}</option>
+                    <option key={f.id} value={f.id}>
+                      {f.nome}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Vendedor:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Vendedor:
+                </label>
                 <select
                   value={selectedRow.vendedorId || ""}
-                  onChange={e => setSelectedRow({ ...selectedRow, vendedorId: e.target.value })}
+                  onChange={(e) =>
+                    setSelectedRow({
+                      ...selectedRow,
+                      vendedorId: e.target.value,
+                    })
+                  }
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
                   {vendedores.map((v) => (
-                    <option key={v.id} value={v.id}>{v.nome}</option>
+                    <option key={v.id} value={v.id}>
+                      {v.nome}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Pagamento:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Pagamento:
+                </label>
                 <select
                   value={selectedRow.tipoPagamentoId || ""}
-                  onChange={e => setSelectedRow({ ...selectedRow, tipoPagamentoId: e.target.value })}
+                  onChange={(e) =>
+                    setSelectedRow({
+                      ...selectedRow,
+                      tipoPagamentoId: e.target.value,
+                    })
+                  }
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
                   {tiposPagamento.map((t) => (
-                    <option key={t.id} value={t.id}>{t.nome}</option>
+                    <option key={t.id} value={t.id}>
+                      {t.nome}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-[#a243d2] mb-1">Status:</label>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Status:
+                </label>
                 <select
                   value={editStatus}
-                  onChange={e => setEditStatus(e.target.value)}
+                  onChange={(e) => setEditStatus(e.target.value)}
                   className="border border-[#a243d2] p-1 w-full rounded"
                   required
                 >
                   <option value="">Selecione</option>
                   {statusList.map((s) => (
-                    <option key={s.id} value={s.id}>{s.nome}</option>
+                    <option key={s.id} value={s.id}>
+                      {s.nome}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -632,8 +716,13 @@ const SalesPage = () => {
             >
               ×
             </button>
-            <h3 className="text-2xl font-bold text-[#a243d2] mb-4">Nova Venda</h3>
-            <form onSubmit={handleNewSaleSubmit} className="flex flex-col gap-4">
+            <h3 className="text-2xl font-bold text-[#a243d2] mb-4">
+              Nova Venda
+            </h3>
+            <form
+              onSubmit={handleNewSaleSubmit}
+              className="flex flex-col gap-4"
+            >
               <input
                 className="border rounded p-2"
                 name="data_venda"
@@ -651,7 +740,9 @@ const SalesPage = () => {
               >
                 <option value="">Selecione o Cliente</option>
                 {clientes.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nome}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.nome}
+                  </option>
                 ))}
               </select>
               <select
@@ -663,7 +754,9 @@ const SalesPage = () => {
               >
                 <option value="">Selecione o Curso</option>
                 {cursos.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nome}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.nome}
+                  </option>
                 ))}
               </select>
               <select
@@ -675,7 +768,9 @@ const SalesPage = () => {
               >
                 <option value="">Selecione a Modalidade</option>
                 {modalidades.map((m) => (
-                  <option key={m.id} value={m.id}>{m.tipo}</option>
+                  <option key={m.id} value={m.id}>
+                    {m.tipo}
+                  </option>
                 ))}
               </select>
               <input
@@ -695,7 +790,9 @@ const SalesPage = () => {
               >
                 <option value="">Selecione a Filial</option>
                 {filiais.map((f) => (
-                  <option key={f.id} value={f.id}>{f.nome}</option>
+                  <option key={f.id} value={f.id}>
+                    {f.nome}
+                  </option>
                 ))}
               </select>
               <select
@@ -707,7 +804,9 @@ const SalesPage = () => {
               >
                 <option value="">Selecione o Vendedor</option>
                 {vendedores.map((v) => (
-                  <option key={v.id} value={v.id}>{v.nome}</option>
+                  <option key={v.id} value={v.id}>
+                    {v.nome}
+                  </option>
                 ))}
               </select>
               <select
@@ -719,7 +818,9 @@ const SalesPage = () => {
               >
                 <option value="">Selecione o Pagamento</option>
                 {tiposPagamento.map((t) => (
-                  <option key={t.id} value={t.id}>{t.nome}</option>
+                  <option key={t.id} value={t.id}>
+                    {t.nome}
+                  </option>
                 ))}
               </select>
               <select
@@ -731,7 +832,9 @@ const SalesPage = () => {
               >
                 <option value="">Selecione o Status</option>
                 {statusList.map((s) => (
-                  <option key={s.id} value={s.id}>{s.nome}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.nome}
+                  </option>
                 ))}
               </select>
               <button
