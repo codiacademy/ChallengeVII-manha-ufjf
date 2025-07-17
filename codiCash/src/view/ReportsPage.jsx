@@ -24,10 +24,13 @@ import { useNavigate } from "react-router-dom";
 import ChartCustomizer from "../components/ChartCustomizer";
 import ChartPreview from "../components/ChartPreview";
 import Table from "../components/Table";
+import { useAuth } from "../context/AuthContext";
 
 const API_BASE_URL = "http://localhost:3001";
 
 const ReportsPage = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.papel === 'admin';
   const [showChartModal, setShowChartModal] = useState(false);
   const [charts, setCharts] = useState([]);
   const [activeChart, setActiveChart] = useState(null);
@@ -37,6 +40,7 @@ const ReportsPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTable, setSelectedTable] = useState(null);
   const [relatedData, setRelatedData] = useState({});
+  const navigate = useNavigate();
 
   const availableTables = [
     {
@@ -113,14 +117,6 @@ const ReportsPage = () => {
         chartData.id = Date.now().toString();
       }
 
-      console.log("Salvando gráfico:", {
-        method,
-        url,
-        isExisting,
-        editingChartId: editingChart?.id,
-        chartData,
-      });
-
       const response = await fetch(url, {
         method,
         headers: {
@@ -136,14 +132,16 @@ const ReportsPage = () => {
         );
       }
 
-      const savedChart = await response.json();
-      console.log("Gráfico salvo com sucesso:", savedChart);
-
-      return savedChart;
+      return await response.json();
     } catch (error) {
       console.error("Error saving chart:", error);
       throw error;
     }
+  };
+
+  const isDefaultChart = (chartId) => {
+    const defaultChartIds = ["1", "2", "3", "4"];
+    return defaultChartIds.includes(chartId.toString());
   };
 
   const handleSaveChart = async () => {
@@ -172,10 +170,8 @@ const ReportsPage = () => {
             chart.id.toString() === editingChart.id.toString() ? savedChart : chart
           )
         );
-        console.log("Gráfico atualizado na lista");
       } else {
         setCharts((prevCharts) => [...prevCharts, savedChart]);
-        console.log("Novo gráfico adicionado na lista");
       }
 
       setShowCustomizeModal(false);
@@ -193,30 +189,27 @@ const ReportsPage = () => {
   };
 
   const handleEditChart = (chartId) => {
-    const chartToEdit = charts.find((chart) => chart.id.toString() === chartId.toString());
+    const chartToEdit = charts.find(
+      (chart) => chart.id.toString() === chartId.toString()
+    );
     if (chartToEdit) {
-      console.log("Editando gráfico:", chartToEdit);
-
       setEditingChart(chartToEdit);
       setActiveChart({ ...chartToEdit });
       setSelectedTable(chartToEdit.dataSource);
       setAvailableData(chartToEdit.data || []);
       setRelatedData(chartToEdit.relationsData || {});
       setShowCustomizeModal(true);
-
-      console.log("Estado de edição configurado:", {
-        editingChart: chartToEdit,
-        activeChart: chartToEdit,
-        selectedTable: chartToEdit.dataSource,
-      });
     }
   };
 
   const deleteChartFromDB = async (chartId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/graficos/${chartId.toString()}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/graficos/${chartId.toString()}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (!response.ok) throw new Error("Erro ao excluir gráfico");
     } catch (error) {
       console.error("Error deleting chart:", error);
@@ -225,8 +218,15 @@ const ReportsPage = () => {
   };
 
   const shareToDashboard = async (chartId) => {
+    if (!isAdmin) {
+      alert("Apenas administradores podem fixar gráficos no Dashboard.");
+      return false;
+    }
+
     try {
-      const chartResponse = await fetch(`${API_BASE_URL}/graficos/${chartId.toString()}`);
+      const chartResponse = await fetch(
+        `${API_BASE_URL}/graficos/${chartId.toString()}`
+      );
       if (!chartResponse.ok) throw new Error("Gráfico não encontrado");
       const chart = await chartResponse.json();
 
@@ -237,8 +237,10 @@ const ReportsPage = () => {
         dashboard.layout = [];
       }
 
-      const alreadyShared = dashboard.layout.some((item) => item.chartId.toString() === chartId.toString());
-      
+      const alreadyShared = dashboard.layout.some(
+        (item) => item.chartId.toString() === chartId.toString()
+      );
+
       if (alreadyShared) {
         alert("Este gráfico já está compartilhado no dashboard!");
         return false;
@@ -258,7 +260,7 @@ const ReportsPage = () => {
         x: col * (chartWidth + margin),
         y: row * (chartHeight + margin),
         width: chartWidth,
-        height: chartHeight
+        height: chartHeight,
       };
 
       dashboard.layout.push(newItem);
@@ -274,11 +276,6 @@ const ReportsPage = () => {
       if (!updateResponse.ok) {
         throw new Error("Erro ao atualizar dashboard");
       }
-
-      console.log("Gráfico compartilhado com sucesso:", {
-        chartId,
-        position: newItem
-      });
 
       return true;
     } catch (error) {
@@ -319,7 +316,8 @@ const ReportsPage = () => {
       const resolvedItem = { ...item };
       for (const [field, relation] of Object.entries(relations)) {
         if (item[field] && relationsData[field]?.[item[field].toString()]) {
-          resolvedItem[`${field}_label`] = relationsData[field][item[field].toString()];
+          resolvedItem[`${field}_label`] =
+            relationsData[field][item[field].toString()];
         }
       }
       return resolvedItem;
@@ -371,6 +369,7 @@ const ReportsPage = () => {
         dateCreated: Date.now(),
         dataSource: tableId,
         relationsData: relationsData,
+        legends: {},
       });
 
       setSelectedTable(tableId);
@@ -393,15 +392,19 @@ const ReportsPage = () => {
     if (window.confirm("Tem certeza que deseja excluir este gráfico?")) {
       try {
         await deleteChartFromDB(chartId);
-        setCharts(charts.filter((chart) => chart.id.toString() !== chartId.toString()));
-        
+        setCharts(
+          charts.filter((chart) => chart.id.toString() !== chartId.toString())
+        );
+
         try {
           const dashboardResponse = await fetch(`${API_BASE_URL}/dashboard`);
           const dashboard = await dashboardResponse.json();
-          
+
           if (dashboard.layout) {
-            const updatedLayout = dashboard.layout.filter(item => item.chartId.toString() !== chartId.toString());
-            
+            const updatedLayout = dashboard.layout.filter(
+              (item) => item.chartId.toString() !== chartId.toString()
+            );
+
             if (updatedLayout.length !== dashboard.layout.length) {
               await fetch(`${API_BASE_URL}/dashboard`, {
                 method: "PUT",
@@ -415,7 +418,7 @@ const ReportsPage = () => {
         } catch (dashboardError) {
           console.error("Erro ao remover do dashboard:", dashboardError);
         }
-        
+
         alert("Gráfico excluído com sucesso!");
       } catch (error) {
         alert("Erro ao excluir gráfico. Por favor, tente novamente.");
@@ -435,7 +438,9 @@ const ReportsPage = () => {
   };
 
   const handleViewChart = (chartId) => {
-    const chartToView = charts.find((chart) => chart.id.toString() === chartId.toString());
+    const chartToView = charts.find(
+      (chart) => chart.id.toString() === chartId.toString()
+    );
     if (chartToView) {
       setActiveChart(chartToView);
       setShowChartModal(true);
@@ -456,11 +461,12 @@ const ReportsPage = () => {
     id: chart.id,
     Título: chart.title,
     Tipo: chart.type.charAt(0).toUpperCase() + chart.type.slice(1),
-    Campos: chart.dataKeys.join(", "),
+    Campos: isDefaultChart(chart.id) ? " " : chart.dataKeys.join(", "),
     Fonte:
-      availableTables.find((t) => t.id === chart.dataSource)?.name || "N/A",
-    "Criado em": formatDate(chart.dateCreated),
+      isDefaultChart(chart.id) ? " " : availableTables.find((t) => t.id === chart.dataSource)?.name || "N/A",
+    "Criado em": isDefaultChart(chart.id) ? " " : formatDate(chart.dateCreated),
     Dimensões: `${chart.width} × ${chart.height}`,
+    Gráfico: isDefaultChart(chart.id) ? "Padrão" : "Personalizado",
   }));
 
   const tableColumns = [
@@ -470,10 +476,13 @@ const ReportsPage = () => {
     "Fonte",
     "Criado em",
     "Dimensões",
+    "Gráfico",
   ];
 
   const renderActions = (row) => {
     const chartId = row.id;
+    const isDefault = isDefaultChart(chartId);
+
     return (
       <div className="flex justify-center space-x-2">
         <button
@@ -484,23 +493,35 @@ const ReportsPage = () => {
           <Eye size={18} />
         </button>
         <button
-          onClick={() => handleEditChart(chartId)}
-          className="p-1.5 text-[#a243d2] hover:bg-purple-50 rounded-full transition-colors"
-          title="Editar"
+          onClick={() => !isDefault && handleEditChart(chartId)}
+          className={`p-1.5 ${
+            isDefault
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-[#a243d2] hover:bg-purple-50"
+          } rounded-full transition-colors`}
+          title={isDefault ? "Gráfico padrão - não editável" : "Editar"}
+          disabled={isDefault}
         >
           <PenLine size={18} />
         </button>
+        {isAdmin && (
+          <button
+            onClick={() => handleShareToDashboard(chartId)}
+            className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+            title="Fixar Dashboard"
+          >
+            <Pin size={18} />
+          </button>
+        )}
         <button
-          onClick={() => handleShareToDashboard(chartId)}
-          className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-          title="Fixar Dashboard"
-        >
-          <Pin size={18} />
-        </button>
-        <button
-          onClick={() => handleDeleteChart(chartId)}
-          className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors"
-          title="Excluir"
+          onClick={() => !isDefault && handleDeleteChart(chartId)}
+          className={`p-1.5 ${
+            isDefault
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-red-600 hover:bg-red-50"
+          } rounded-full transition-colors`}
+          title={isDefault ? "Gráfico padrão - não removível" : "Excluir"}
+          disabled={isDefault}
         >
           <Trash2 size={18} />
         </button>
@@ -511,12 +532,11 @@ const ReportsPage = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold text-[#a243d2] mb-6">Relatórios</h2>
-
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <p className="text-[#a243d2]">
-            Crie e gerencie gráficos personalizados para análise de dados
-          </p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-[#a243d2]">Relatórios</h2>
+              <p className="text-[#a243d2]">Crie e gerencie gráficos personalizados para análise de dados</p>
+            </div>
           <Buttons
             className="flex items-center gap-2 rounded-full px-4 py-2 text-white bg-[#a243d2] hover:bg-[#8a36b5]"
             onClick={() => {
@@ -619,7 +639,6 @@ const ReportsPage = () => {
                       <Database size={20} className="text-[#a243d2]" />
                     )}
                   </div>
-
                   <span className="text-gray-800 text-center">
                     {table.name}
                   </span>

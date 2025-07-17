@@ -1,9 +1,11 @@
 import React from "react";
 import cclogo from "../img/cclogo.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const LogInPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [nome, setNome] = React.useState("");
   const [senha, setSenha] = React.useState("");
 
@@ -13,7 +15,12 @@ const LogInPage = () => {
       const response = await fetch('http://localhost:3001/usuarios?nome=' + nome);
       const users = await response.json();
       if (users.length > 0 && users[0].senha === senha) {
-        localStorage.setItem("loggedInUser", users[0].nome);
+        login({
+          id: users[0].id,
+          nome: users[0].nome,
+          email: users[0].email,
+          papel: users[0].papel
+        });
         navigate("/dashboard");
       } else {
         alert("Usuário ou senha incorretos. Tente novamente.");

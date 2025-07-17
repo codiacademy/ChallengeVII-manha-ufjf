@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Buttons from "../components/Buttons";
 import Modal from "../components/Modal";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const SettingsPage = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const isAdmin = user?.papel === 'admin';
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem("settingsActiveTab") || "profile");
   const [users, setUsers] = useState([]);
   const [vendedores, setVendedores] = useState([]);
@@ -22,12 +25,13 @@ const SettingsPage = () => {
     email: "",
     telefone: "",
   });
-  // Função utilitária para IDs sequenciais string
+
   function getNextId(array) {
     if (!array || array.length === 0) return "1";
     const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
     return String(maxId + 1);
   }
+
   // CLIENTES
   const fetchClientes = () => {
     fetch("http://localhost:3001/clientes")
@@ -97,8 +101,6 @@ const SettingsPage = () => {
         });
     }
   };
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
     nome: "",
@@ -121,32 +123,29 @@ const SettingsPage = () => {
   });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("loggedInUserData"));
-    if (user) {
-      setLoggedInUser(user);
-      setIsAdmin(user.papel === "admin");
-      setProfileForm({
-        nome: user.nome,
-        email: user.email,
-        senhaAtual: "",
-        novaSenha: "",
-        confirmarSenha: "",
-      });
-
-      fetchUsers();
-      fetchVendedores();
-      fetchFiliais();
-      fetchClientes();
-    } else {
+    if (!user) {
       navigate("/");
+      return;
     }
-  }, [navigate]);
+
+    setProfileForm({
+      nome: user.nome,
+      email: user.email,
+      senhaAtual: "",
+      novaSenha: "",
+      confirmarSenha: "",
+    });
+
+    fetchUsers();
+    fetchVendedores();
+    fetchFiliais();
+    fetchClientes();
+  }, [user, navigate]);
 
   // Persistir aba ativa
   useEffect(() => {
     localStorage.setItem("settingsActiveTab", activeTab);
   }, [activeTab]);
-  // ...existing code...
 
   const fetchUsers = () => {
     fetch("http://localhost:3001/usuarios")
@@ -214,14 +213,6 @@ const SettingsPage = () => {
       return;
     }
 
-    if (
-      profileForm.senhaAtual &&
-      profileForm.senhaAtual !== loggedInUser.senha
-    ) {
-      toast.error("Senha atual incorreta");
-      return;
-    }
-
     const updatedData = {
       nome: profileForm.nome,
       email: profileForm.email,
@@ -229,7 +220,7 @@ const SettingsPage = () => {
       data_atualizacao: new Date().toISOString(),
     };
 
-    fetch(`http://localhost:3001/usuarios/${loggedInUser.id}`, {
+    fetch(`http://localhost:3001/usuarios/${user.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -239,8 +230,10 @@ const SettingsPage = () => {
       .then((response) => response.json())
       .then((updatedUser) => {
         toast.success("Perfil atualizado com sucesso!");
-        localStorage.setItem("loggedInUserData", JSON.stringify(updatedUser));
-        setLoggedInUser(updatedUser);
+        
+        if (user.id === updatedUser.id) {
+          // Você pode querer atualizar o contexto aqui se necessário
+        }
         setProfileForm({
           ...profileForm,
           senhaAtual: "",
@@ -256,6 +249,11 @@ const SettingsPage = () => {
 
   const handleUserSubmit = (e) => {
     e.preventDefault();
+
+    if (!isAdmin) {
+      toast.error("Apenas administradores podem gerenciar usuários");
+      return;
+    }
 
     const method = currentUser ? "PUT" : "POST";
     const url = currentUser
@@ -329,6 +327,10 @@ const SettingsPage = () => {
   };
 
   const handleEditUser = (user) => {
+    if (!isAdmin) {
+      toast.error("Apenas administradores podem editar usuários");
+      return;
+    }
     setCurrentUser(user);
     setUserForm({
       nome: user.nome,
@@ -349,6 +351,16 @@ const SettingsPage = () => {
   };
 
   const handleDeleteUser = (userId) => {
+    if (!isAdmin) {
+      toast.error("Apenas administradores podem deletar usuários");
+      return;
+    }
+
+    if (userId === user.id) {
+      toast.error("Você não pode deletar seu próprio usuário");
+      return;
+    }
+
     if (window.confirm("Tem certeza que deseja deletar este usuário?")) {
       fetch(`http://localhost:3001/usuarios/${userId}`, {
         method: "DELETE",
@@ -382,7 +394,6 @@ const SettingsPage = () => {
 
   return (
     <div className="p-6">
-      {/* ...existing code for the rest of the page... */}
       <Modal
         isOpen={isClientModalOpen}
         onClose={() => {
@@ -677,7 +688,7 @@ const SettingsPage = () => {
                       >
                         Editar
                       </button>
-                      {user.id !== loggedInUser?.id && (
+                      {user.id !== user?.id && (
                         <button
                           onClick={() => handleDeleteUser(user.id)}
                           className="text-red-600 hover:text-red-800"
