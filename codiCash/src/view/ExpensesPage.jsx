@@ -7,6 +7,8 @@ import {
   Trash2,
   PenLine,
   CalendarDays,
+  TrendingDown,
+  DollarSign,
 } from "lucide-react";
 import Buttons from "../components/Buttons";
 
@@ -255,7 +257,10 @@ const ExpensesPage = () => {
   useEffect(() => {
     if (!showViewModal) return;
     const handleClickOutside = (event) => {
-      if (viewModalRef.current && !viewModalRef.current.contains(event.target)) {
+      if (
+        viewModalRef.current &&
+        !viewModalRef.current.contains(event.target)
+      ) {
         setShowViewModal(false);
       }
     };
@@ -420,35 +425,65 @@ const ExpensesPage = () => {
           </Buttons>
         </div>
 
-        <div className="flex gap-4 mb-4 w-full">
-          <div className="bg-white p-4 rounded-lg shadow-md flex-1 border-l-4 border-blue-500">
-            <h3 className="font-bold text-gray-700">Total Fixas</h3>
-            <p className="text-2xl font-bold">
-              {totalFixa.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 w-full">
+          {/* Card Fixa (azul) */}
+          <div className="bg-white bg-opacity-80 rounded-lg p-4 border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Total Fixas
+                </p>
+                <p className="text-xl font-bold text-gray-800 mt-1">
+                  {totalFixa.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                <TrendingDown size={16} className="text-blue-500" />
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg shadow-md flex-1 border-l-4 border-green-500">
-            <h3 className="font-bold text-gray-700">Total Variáveis</h3>
-            <p className="text-2xl font-bold">
-              {totalVariavel.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </p>
+          {/* Card Variável (verde) */}
+          <div className="bg-white bg-opacity-80 rounded-lg p-4 border-l-4 border-green-500 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Total Variáveis
+                </p>
+                <p className="text-xl font-bold text-gray-800 mt-1">
+                  {totalVariavel.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
+                <TrendingDown size={16} className="text-green-500" />
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg shadow-md flex-1 border-l-4 border-purple-500">
-            <h3 className="font-bold text-gray-700">Total Geral</h3>
-            <p className="text-2xl font-bold">
-              {totalGeral.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </p>
+          {/* Card Total Geral (roxo) */}
+          <div className="bg-white bg-opacity-80 rounded-lg p-4 border-l-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Total Geral
+                </p>
+                <p className="text-xl font-bold text-gray-800 mt-1">
+                  {totalGeral.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center">
+                <DollarSign size={16} className="text-purple-500" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -832,7 +867,7 @@ const ExpensesPage = () => {
 
       {showViewModal && viewRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
-          <div 
+          <div
             ref={viewModalRef}
             className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
           >
