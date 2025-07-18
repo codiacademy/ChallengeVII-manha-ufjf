@@ -7,10 +7,12 @@ import {
   Trash2,
   PenLine,
   CalendarDays,
-  TrendingDown,
-  DollarSign,
+  LocateFixed, 
+  TrendingUpDown, 
+  BanknoteArrowDown
 } from "lucide-react";
 import Buttons from "../components/Buttons";
+import SummaryCard from "../components/SummaryCard";
 
 function getNextId(array) {
   if (!array || array.length === 0) return "1";
@@ -404,6 +406,35 @@ const ExpensesPage = () => {
     setData((prev) => [...prev, novaDespesaFormatada]);
   };
 
+  const formatCurrency = (value) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+
+  const summaryCards = [
+    {
+      title: "Total Fixas",
+      value: formatCurrency(totalFixa),
+      icon: <LocateFixed size={24} className="text-blue-500" />,
+      color: "bg-blue-50",
+      borderColor: "border-blue-200",
+    },
+    {
+      title: "Total Variáveis",
+      value: formatCurrency(totalVariavel),
+      icon: <TrendingUpDown size={24} className="text-green-500" />,
+      color: "bg-green-50",
+      borderColor: "border-green-200",
+    },
+    {
+      title: "Total Geral",
+      value: formatCurrency(totalGeral),
+      icon: <BanknoteArrowDown size={24} className="text-purple-500" />,
+      color: "bg-purple-200",
+    },
+  ];
+
   return (
     <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
       <div className="w-full max-w-5xl flex flex-col items-center">
@@ -426,65 +457,7 @@ const ExpensesPage = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 w-full">
-          {/* Card Fixa (azul) */}
-          <div className="bg-white bg-opacity-80 rounded-lg p-4 border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Total Fixas
-                </p>
-                <p className="text-xl font-bold text-gray-800 mt-1">
-                  {totalFixa.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
-                <TrendingDown size={16} className="text-blue-500" />
-              </div>
-            </div>
-          </div>
-
-          {/* Card Variável (verde) */}
-          <div className="bg-white bg-opacity-80 rounded-lg p-4 border-l-4 border-green-500 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Total Variáveis
-                </p>
-                <p className="text-xl font-bold text-gray-800 mt-1">
-                  {totalVariavel.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
-                <TrendingDown size={16} className="text-green-500" />
-              </div>
-            </div>
-          </div>
-
-          {/* Card Total Geral (roxo) */}
-          <div className="bg-white bg-opacity-80 rounded-lg p-4 border-l-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Total Geral
-                </p>
-                <p className="text-xl font-bold text-gray-800 mt-1">
-                  {totalGeral.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center">
-                <DollarSign size={16} className="text-purple-500" />
-              </div>
-            </div>
-          </div>
+          {summaryCards.map((card, i) => <SummaryCard key={i} {...card} />)}
         </div>
 
         <div className="flex flex-row items-center justify-between w-full mb-4 gap-2">

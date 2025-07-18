@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "../components/Table";
-import { SquarePlus, Funnel, Eye, Trash2, PenLine } from "lucide-react";
+import { SquarePlus, Funnel, Eye, Trash2, PenLine, TrendingUp, DollarSign, TrendingDown, BarChart3 } from "lucide-react";
 import Buttons from "../components/Buttons";
+import SummaryCard from "../components/SummaryCard";
 
 // Função utilitária para IDs sequenciais
 function getNextId(array) {
@@ -101,6 +102,45 @@ const SalesPage = () => {
   const [selectedField, setSelectedField] = useState("");
   const [filteredData, setFilteredData] = useState([]);
 
+  // Calcular totais para os cards
+  const totalVendas = data.reduce((sum, item) => sum + (item.valorTotal || 0), 0);
+  const totalComissoes = data.reduce((sum, item) => sum + (item.comissao || 0), 0);
+  const totalDescontos = data.reduce((sum, item) => sum + (item.desconto || 0), 0);
+  const vendasPorStatus = statusList.map(status => ({
+    status: status.nome,
+    count: data.filter(item => item.statusId === status.id).length
+  }));
+
+  const formatCurrency = (value) => 
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+
+  const summaryCards = [
+    {
+      title: "Total em Vendas",
+      value: formatCurrency(totalVendas),
+      icon: <TrendingUp size={24} className="text-green-500" />,
+      color: "bg-green-50",
+      borderColor: "border-green-200"
+    },
+    {
+      title: "Total em Comissões",
+      value: formatCurrency(totalComissoes),
+      icon: <DollarSign size={24} className="text-blue-500" />,
+      color: "bg-blue-50",
+      borderColor: "border-blue-200"
+    },
+    {
+      title: "Total em Descontos",
+      value: formatCurrency(totalDescontos),
+      icon: <TrendingDown size={24} className="text-red-500" />,
+      color: "bg-red-50",
+      borderColor: "border-red-200"
+    },
+  ];
+
   const calcularValorTotal = (
     cursoPreco,
     desconto,
@@ -144,7 +184,7 @@ const SalesPage = () => {
       commission,
       taxes,
       cardFee,
-      total: Math.max(0, total), // Garante que não fique negativo
+      total: Math.max(0, total),
     };
   };
 
@@ -212,8 +252,6 @@ const SalesPage = () => {
         setFiliais(filiaisData);
         setVendedores(vendedoresData);
         setTiposPagamento(tiposPagamentoData);
-        // Add this right after your fetch call in the main useEffect
-        console.log("Raw vendas data:", vendas);
 
         const vendasEnriquecidas = vendas.map((venda) => ({
           id: venda.id,
@@ -442,8 +480,6 @@ const SalesPage = () => {
       selectedRow.tipoPagamentoId
     );
 
-    console.log("Saving edit with valorTotal:", valorTotal);
-
     const vendaAtualizada = {
       ...vendaOriginal,
       valorTotal: Number(valorTotal),
@@ -532,6 +568,14 @@ const SalesPage = () => {
         <p className="text-[#a243d2] text-lg mb-6 w-full text-left">
           Lançamento e gerenciamento de vendas de cursos
         </p>
+
+        {/* Cards de Resumo */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 w-full">
+          {summaryCards.map((card, i) => (
+            <SummaryCard key={i} {...card} />
+          ))}
+        </div>
+
         <div className="flex flex-row items-center justify-end w-full mb-4 gap-2">
           <button
             className="flex items-center gap-2 px-3 py-1 rounded bg-transparent border border-[#a243d2] text-[#a243d2] hover:bg-[#e9e0f7]"
@@ -612,6 +656,7 @@ const SalesPage = () => {
           />
         </div>
       </div>
+
       {/* Modal Editar Venda */}
       {showEditForm && selectedRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
@@ -833,6 +878,7 @@ const SalesPage = () => {
           </div>
         </div>
       )}
+
       {/* Modal Nova Venda */}
       {showNewSaleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
@@ -1006,6 +1052,7 @@ const SalesPage = () => {
           </div>
         </div>
       )}
+
       {/* Modal Visualizar Venda */}
       {showViewModal && viewRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
