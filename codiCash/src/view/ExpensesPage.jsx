@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "../components/Table";
-import { SquarePlus, Funnel, Eye, Trash2, PenLine } from "lucide-react";
+import {
+  SquarePlus,
+  Funnel,
+  Eye,
+  Trash2,
+  PenLine,
+  CalendarDays,
+} from "lucide-react";
 import Buttons from "../components/Buttons";
-
-// Colocar lógica de parcelas, desconto, impostos, etc
 
 function getNextId(array) {
   if (!array || array.length === 0) return "1";
@@ -11,7 +16,6 @@ function getNextId(array) {
   return String(maxId + 1);
 }
 
-// Componente de busca/filtro para despesas
 function SearchFilterExpenses({
   data,
   columns,
@@ -49,23 +53,23 @@ function SearchFilterExpenses({
   };
 
   return (
-    <div className="flex flex-row gap-2 items-center w-full mb-2">
+    <div className="flex flex-row gap-2 items-center w-full mb-2 h-[38px]">
       <input
         type="text"
         placeholder="Buscar..."
-        className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] placeholder-[#a243d2] bg-transparent"
+        className="border border-[#a243d2] rounded px-2 py-1.5 text-[#a243d2] placeholder-[#a243d2] bg-transparent h-full"
         value={localSearch}
         onChange={(e) => setLocalSearch(e.target.value)}
       />
       <button
-        className="px-3 py-1 rounded bg-[#a243d2] text-white font-semibold border border-[#a243d2] hover:bg-[#580581]"
+        className="px-3 py-1.5 rounded bg-[#a243d2] text-white font-semibold border border-[#a243d2] hover:bg-[#580581] h-full"
         onClick={handleSearch}
         type="button"
       >
         Buscar
       </button>
       <button
-        className="px-3 py-1 rounded bg-gray-200 text-[#a243d2] font-semibold border border-[#a243d2] ml-1 hover:bg-gray-300"
+        className="px-3 py-1.5 rounded bg-gray-200 text-[#a243d2] font-semibold border border-[#a243d2] ml-1 hover:bg-gray-300 h-full"
         onClick={handleClearSearch}
         type="button"
       >
@@ -83,6 +87,7 @@ const ExpensesPage = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const popoverRef = useRef();
   const modalRef = useRef();
+  const viewModalRef = useRef();
 
   const [showEditForm, setShowEditForm] = useState(false);
   const [editValor, setEditValor] = useState("");
@@ -91,24 +96,51 @@ const ExpensesPage = () => {
   const [despesasOriginais, setDespesasOriginais] = useState([]);
   const [statusMap, setStatusMap] = useState({});
 
-  // Para modal de nova despesa
   const [showNewExpenseModal, setShowNewExpenseModal] = useState(false);
   const [tiposDespesas, setTiposDespesas] = useState([]);
   const [filiais, setFiliais] = useState([]);
   const [categoriasDespesas, setCategoriasDespesas] = useState([]);
-  // Busca e filtro
+
   const [filteredData, setFilteredData] = useState([]);
-  // Modal filtro
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedField, setSelectedField] = useState("");
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
 
-  // Novo estado para modal de visualização
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewRow, setViewRow] = useState(null);
 
+  const totalFixa = data
+    .filter((item) => item.Categoria === "Fixa")
+    .reduce((sum, item) => sum + (item.valor || 0), 0);
+
+  const totalVariavel = data
+    .filter((item) => item.Categoria === "Variável")
+    .reduce((sum, item) => sum + (item.valor || 0), 0);
+
+  const totalGeral = totalFixa + totalVariavel;
+
   useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
+    let result = [...data];
+
+    if (activeCategory) {
+      result = result.filter((item) => item.Categoria === activeCategory);
+    }
+
+    if (dateRange.start || dateRange.end) {
+      result = result.filter((item) => {
+        const itemDate = new Date(item.data_despesa);
+        const startDate = dateRange.start ? new Date(dateRange.start) : null;
+        const endDate = dateRange.end ? new Date(dateRange.end) : null;
+
+        if (startDate && itemDate < startDate) return false;
+        if (endDate && itemDate > endDate) return false;
+        return true;
+      });
+    }
+
+    setFilteredData(result);
+  }, [data, activeCategory, dateRange]);
 
   useEffect(() => {
     fetch("http://localhost:3001/status")
@@ -143,35 +175,34 @@ const ExpensesPage = () => {
         setFiliais(filiaisData);
         setCategoriasDespesas(categoriasDespesasData);
 
-        const despesasEnriquecidas = despesas.map((despesa) => ({
-          id: despesa.id,
-          Data: new Date(despesa.data_despesa).toLocaleDateString("pt-BR"),
-          Categoria:
-            categoriasDespesasData.find(
-              (c) =>
-                c.id ===
-                tiposDespesasData.find((t) => t.id === despesa.tipoDespesaId)
-                  ?.categoriaId
-            )?.nome || "",
-          Filial:
-            filiaisData.find((f) => f.id === despesa.filialId)?.nome ||
-            despesa.filialId,
-          Descrição:
-            tiposDespesasData.find((t) => t.id === despesa.tipoDespesaId)
-              ?.descricao ||
-            despesa.descricao ||
-            "",
-          Valor: `R$ ${Number(despesa.valor).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}`,
-          Pagamento: "PIX", // ajuste conforme seu backend
-          Status:
-            status.find((s) => s.id === despesa.statusId)?.nome ||
-            despesa.statusId,
-          statusId: despesa.statusId,
-          valor: despesa.valor,
-          data_despesa: despesa.data_despesa,
-        }));
+        const despesasEnriquecidas = despesas.map((despesa) => {
+          const tipoDespesa = tiposDespesasData.find(
+            (t) => t.id === despesa.tipoDespesaId
+          );
+          const categoria = categoriasDespesasData.find(
+            (c) => c.id === tipoDespesa?.categoriaId
+          );
+
+          return {
+            id: despesa.id,
+            Data: new Date(despesa.data_despesa).toLocaleDateString("pt-BR"),
+            Categoria: categoria?.nome || "",
+            Filial:
+              filiaisData.find((f) => f.id === despesa.filialId)?.nome ||
+              despesa.filialId,
+            Descrição: tipoDespesa?.nome || despesa.descricao || "",
+            Valor: `R$ ${Number(despesa.valor).toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })}`,
+            Status:
+              status.find((s) => s.id === despesa.statusId)?.nome ||
+              despesa.statusId,
+            statusId: despesa.statusId,
+            valor: despesa.valor,
+            data_despesa: despesa.data_despesa,
+            tipoDespesaId: despesa.tipoDespesaId,
+          };
+        });
 
         setData(despesasEnriquecidas);
         setColumns([
@@ -180,7 +211,6 @@ const ExpensesPage = () => {
           "Filial",
           "Descrição",
           "Valor",
-          "Pagamento",
           "Status",
         ]);
       }
@@ -211,8 +241,30 @@ const ExpensesPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showPopover, showEditForm]);
 
+  useEffect(() => {
+    if (!showNewExpenseModal) return;
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setShowNewExpenseModal(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNewExpenseModal]);
+
+  useEffect(() => {
+    if (!showViewModal) return;
+    const handleClickOutside = (event) => {
+      if (viewModalRef.current && !viewModalRef.current.contains(event.target)) {
+        setShowViewModal(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showViewModal]);
+
   const handleEdit = () => {
-    setEditValor(selectedRow.Valor.replace(/[^\d,]/g, "").replace(",", "."));
+    setEditValor(selectedRow.valor);
     setEditStatus(
       statusList.find((s) => s.nome === selectedRow.Status)?.id || ""
     );
@@ -226,13 +278,13 @@ const ExpensesPage = () => {
     );
     if (!despesaOriginal) return;
 
-    // Atualiza todos os campos editáveis
     const despesaAtualizada = {
       ...despesaOriginal,
+      tipoDespesaId: selectedRow.tipoDespesaId,
       valor: Number(editValor),
       statusId: editStatus,
-      data_despesa: selectedRow.data_despesa || despesaOriginal.data_despesa,
-      descricao: selectedRow.Descrição || despesaOriginal.descricao,
+      data_despesa: selectedRow.data_despesa,
+      descricao: selectedRow.Descrição,
     };
 
     await fetch(`http://localhost:3001/despesas/${selectedRow.id}`, {
@@ -241,7 +293,13 @@ const ExpensesPage = () => {
       body: JSON.stringify(despesaAtualizada),
     });
 
-    // Atualiza tabela exibida
+    const tipoDespesa = tiposDespesas.find(
+      (t) => t.id === selectedRow.tipoDespesaId
+    );
+    const categoria =
+      categoriasDespesas.find((c) => c.id === tipoDespesa?.categoriaId)?.nome ||
+      "";
+
     setData((prev) =>
       prev.map((item) =>
         item.id === selectedRow.id
@@ -255,6 +313,8 @@ const ExpensesPage = () => {
               Descrição: despesaAtualizada.descricao,
               valor: Number(editValor),
               statusId: editStatus,
+              tipoDespesaId: selectedRow.tipoDespesaId,
+              Categoria: categoria,
             }
           : item
       )
@@ -272,7 +332,6 @@ const ExpensesPage = () => {
     setSelectedRow(null);
   };
 
-  // --- Modal Nova Despesa ---
   const [form, setForm] = useState({
     tipoDespesaId: "",
     valor: "",
@@ -288,19 +347,45 @@ const ExpensesPage = () => {
 
   const handleNewExpenseSubmit = async (e) => {
     e.preventDefault();
-    const novoId = getNextId(data); // data é o array de despesas já carregado
+    const novoId = getNextId(data);
     const novaDespesa = {
       ...form,
       id: novoId,
       valor: Number(form.valor),
       data_despesa: form.data_despesa || new Date().toISOString(),
     };
+
     const response = await fetch("http://localhost:3001/despesas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(novaDespesa),
     });
+
     const despesaSalva = await response.json();
+
+    const tipoDespesa = tiposDespesas.find((t) => t.id === form.tipoDespesaId);
+    const categoria =
+      categoriasDespesas.find((c) => c.id === tipoDespesa?.categoriaId)?.nome ||
+      "";
+    const filial = filiais.find((f) => f.id === form.filialId)?.nome || "";
+    const status = statusList.find((s) => s.id === form.statusId)?.nome || "";
+
+    const novaDespesaFormatada = {
+      id: novoId,
+      Data: new Date(despesaSalva.data_despesa).toLocaleDateString("pt-BR"),
+      Categoria: categoria,
+      Filial: filial,
+      Descrição: tipoDespesa?.nome || form.descricao || "",
+      Valor: `R$ ${Number(form.valor).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
+      Status: status,
+      statusId: form.statusId,
+      valor: Number(form.valor),
+      data_despesa: despesaSalva.data_despesa,
+      tipoDespesaId: form.tipoDespesaId,
+    };
+
     setShowNewExpenseModal(false);
     setForm({
       tipoDespesaId: "",
@@ -310,79 +395,127 @@ const ExpensesPage = () => {
       data_despesa: "",
       descricao: "",
     });
-    setData((prev) => [...prev, despesaSalva]);
-  };
 
-  useEffect(() => {
-    if (!showNewExpenseModal) return;
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setShowNewExpenseModal(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showNewExpenseModal]);
+    setData((prev) => [...prev, novaDespesaFormatada]);
+  };
 
   return (
     <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
       <div className="w-full max-w-5xl flex flex-col items-center">
-        <h2 className="text-4xl font-bold text-[#a243d2] mt-6 mb-1 w-full text-left">
-          Despesas
-        </h2>
-        <p className="text-[#a243d2] text-lg mb-6 w-full text-left">
-          Lançamento e gerenciamento de despesas fixas e variáveis
-        </p>
-        <div className="flex flex-row items-center justify-end w-full mb-4 gap-2">
-          <button className="px-4 py-2 rounded-full bg-[#e9e0f7] text-[#a243d2] font-semibold border border-[#a243d2] shadow-sm">
-            Despesas fixas
-          </button>
-          <button className="px-4 py-2 rounded-full bg-[#e9e0f7] text-[#a243d2] font-semibold border border-[#a243d2] shadow-sm opacity-60">
-            Despesas Variáveis
-          </button>
-          <button
-            className="flex items-center gap-2 px-3 py-1 rounded bg-transparent border border-[#a243d2] text-[#a243d2] hover:bg-[#e9e0f7] ml-4"
-            onClick={() => setShowFilterModal(!showFilterModal)}
-            type="button"
-            style={{ minWidth: 40 }}
-          >
-            <Funnel />
-          </button>
-          {showFilterModal && (
-            <select
-              className="border border-[#a243d2] rounded px-2 py-1 text-[#a243d2] bg-transparent"
-              value={selectedField}
-              onChange={(e) => setSelectedField(e.target.value)}
-              style={{ minWidth: 140 }}
-            >
-              <option value="">Todos os campos</option>
-              {columns.map((col) => (
-                <option key={col} value={col}>
-                  {col}
-                </option>
-              ))}
-            </select>
-          )}
-          <div
-            className="flex flex-row gap-2 items-center"
-            style={{ minWidth: 320 }}
-          >
-            <SearchFilterExpenses
-              data={data}
-              columns={columns}
-              setFilteredData={setFilteredData}
-              selectedField={selectedField}
-            />
+        <div className="flex justify-between items-center w-full mb-6">
+          <div>
+            <h2 className="text-4xl font-bold text-[#a243d2] mt-6 mb-1">
+              Despesas
+            </h2>
+            <p className="text-[#a243d2] text-lg">
+              Lançamento e gerenciamento de despesas fixas e variáveis
+            </p>
           </div>
           <Buttons
-            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm ml-4"
+            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm mt-6"
             onClick={() => setShowNewExpenseModal(true)}
-            style={{ marginLeft: "auto" }}
           >
             <SquarePlus size={18} />
             <span>Nova Despesa</span>
           </Buttons>
         </div>
+
+        <div className="flex gap-4 mb-4 w-full">
+          <div className="bg-white p-4 rounded-lg shadow-md flex-1 border-l-4 border-blue-500">
+            <h3 className="font-bold text-gray-700">Total Fixas</h3>
+            <p className="text-2xl font-bold">
+              {totalFixa.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </p>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow-md flex-1 border-l-4 border-green-500">
+            <h3 className="font-bold text-gray-700">Total Variáveis</h3>
+            <p className="text-2xl font-bold">
+              {totalVariavel.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </p>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow-md flex-1 border-l-4 border-purple-500">
+            <h3 className="font-bold text-gray-700">Total Geral</h3>
+            <p className="text-2xl font-bold">
+              {totalGeral.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-row items-center justify-between w-full mb-4 gap-2">
+          <div className="flex items-center gap-2 h-[38px]">
+            <div className="flex items-center gap-1 text-[#a243d2]">
+              <CalendarDays size={18} />
+              <span>Período:</span>
+            </div>
+            <input
+              type="date"
+              value={dateRange.start}
+              onChange={(e) =>
+                setDateRange({ ...dateRange, start: e.target.value })
+              }
+              className="border border-[#a243d2] rounded px-2 py-1.5 text-[#a243d2] bg-transparent h-full"
+            />
+            <span>até</span>
+            <input
+              type="date"
+              value={dateRange.end}
+              onChange={(e) =>
+                setDateRange({ ...dateRange, end: e.target.value })
+              }
+              className="border border-[#a243d2] rounded px-2 py-1.5 text-[#a243d2] bg-transparent h-full"
+            />
+          </div>
+
+          <div className="flex flex-row gap-2 items-center h-[38px]">
+            <button
+              className="flex items-center gap-2 px-3 py-1.5 rounded bg-transparent border border-[#a243d2] text-[#a243d2] hover:bg-[#e9e0f7] h-full"
+              onClick={() => setShowFilterModal(!showFilterModal)}
+              type="button"
+              style={{ minWidth: 40 }}
+            >
+              <Funnel />
+            </button>
+            {showFilterModal && (
+              <select
+                className="border border-[#a243d2] rounded px-2 py-1.5 text-[#a243d2] bg-transparent h-full"
+                value={selectedField}
+                onChange={(e) => setSelectedField(e.target.value)}
+                style={{ minWidth: 140 }}
+              >
+                <option value="">Todos os campos</option>
+                {columns.map((col) => (
+                  <option key={col} value={col}>
+                    {col}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <div
+              className="flex flex-row gap-2 items-center h-full"
+              style={{ minWidth: 320 }}
+            >
+              <SearchFilterExpenses
+                data={data}
+                columns={columns}
+                setFilteredData={setFilteredData}
+                selectedField={selectedField}
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-lg p-0 w-full border-2 border-[#a243d2]">
           <Table
             data={filteredData}
@@ -434,12 +567,12 @@ const ExpensesPage = () => {
           />
         </div>
       </div>
-      {/* Modal de edição permanece, mas o popover de ações foi removido */}
+
       {showEditForm && selectedRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
           <div
             ref={popoverRef}
-            className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
+            className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
             style={{ minWidth: 320 }}
           >
             <form
@@ -469,28 +602,33 @@ const ExpensesPage = () => {
                   className="border border-[#a243d2] p-1 w-full rounded"
                 />
               </div>
+
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
-                  Categoria:
+                  Tipo de Despesa:
                 </label>
                 <select
-                  value={selectedRow.Categoria || ""}
-                  onChange={(e) =>
+                  value={selectedRow.tipoDespesaId || ""}
+                  onChange={(e) => {
+                    const tipoId = e.target.value;
+                    const tipo = tiposDespesas.find((t) => t.id === tipoId);
                     setSelectedRow({
                       ...selectedRow,
-                      Categoria: e.target.value,
-                    })
-                  }
+                      tipoDespesaId: tipoId,
+                      Descrição: tipo ? tipo.nome : selectedRow.Descrição,
+                    });
+                  }}
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
-                  {categoriasDespesas.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.nome}
+                  {tiposDespesas.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.nome}
                     </option>
                   ))}
                 </select>
               </div>
+
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Filial:
@@ -510,6 +648,7 @@ const ExpensesPage = () => {
                   ))}
                 </select>
               </div>
+
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Descrição:
@@ -526,6 +665,7 @@ const ExpensesPage = () => {
                   className="border border-[#a243d2] p-1 w-full rounded"
                 />
               </div>
+
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Valor:
@@ -538,22 +678,7 @@ const ExpensesPage = () => {
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm text-[#a243d2] mb-1">
-                  Pagamento:
-                </label>
-                <input
-                  type="text"
-                  value={selectedRow.Pagamento || ""}
-                  onChange={(e) =>
-                    setSelectedRow({
-                      ...selectedRow,
-                      Pagamento: e.target.value,
-                    })
-                  }
-                  className="border border-[#a243d2] p-1 w-full rounded"
-                />
-              </div>
+
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Status:
@@ -572,35 +697,38 @@ const ExpensesPage = () => {
                   ))}
                 </select>
               </div>
-              <button
-                type="submit"
-                className="block w-full text-left text-green-600 mb-2"
-              >
-                Salvar
-              </button>
-              <button
-                type="button"
-                className="block w-full text-left text-gray-600"
-                onClick={() => {
-                  setShowEditForm(false);
-                  setSelectedRow(null);
-                }}
-              >
-                Cancelar
-              </button>
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded bg-gray-200 text-[#a243d2] font-semibold hover:bg-gray-300"
+                  onClick={() => {
+                    setShowEditForm(false);
+                    setSelectedRow(null);
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-[#a243d2] text-white font-semibold hover:bg-[#580581]"
+                >
+                  Salvar
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
-      {/* Modal Nova Despesa */}
+
       {showNewExpenseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
           <div
             ref={modalRef}
-            className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
+            className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
           >
             <button
-              className="absolute top-2 right-4 text-2xl text-[#a243d2] font-bold"
+              className="absolute top-4 right-4 text-2xl text-[#a243d2] font-bold"
               onClick={() => setShowNewExpenseModal(false)}
             >
               ×
@@ -616,7 +744,7 @@ const ExpensesPage = () => {
                 name="tipoDespesaId"
                 value={form.tipoDespesaId}
                 onChange={handleFormChange}
-                className="border rounded p-2"
+                className="border border-[#a243d2] rounded p-2 text-[#a243d2]"
                 required
               >
                 <option value="">Selecione o Tipo de Despesa</option>
@@ -626,8 +754,9 @@ const ExpensesPage = () => {
                   </option>
                 ))}
               </select>
+
               <input
-                className="border rounded p-2"
+                className="border border-[#a243d2] rounded p-2 text-[#a243d2]"
                 name="valor"
                 placeholder="Valor"
                 type="number"
@@ -635,11 +764,12 @@ const ExpensesPage = () => {
                 onChange={handleFormChange}
                 required
               />
+
               <select
                 name="filialId"
                 value={form.filialId}
                 onChange={handleFormChange}
-                className="border rounded p-2"
+                className="border border-[#a243d2] rounded p-2 text-[#a243d2]"
               >
                 <option value="">Selecione a Filial</option>
                 {filiais.map((f) => (
@@ -648,11 +778,12 @@ const ExpensesPage = () => {
                   </option>
                 ))}
               </select>
+
               <select
                 name="statusId"
                 value={form.statusId}
                 onChange={handleFormChange}
-                className="border rounded p-2"
+                className="border border-[#a243d2] rounded p-2 text-[#a243d2]"
                 required
               >
                 <option value="">Selecione o Status</option>
@@ -662,36 +793,51 @@ const ExpensesPage = () => {
                   </option>
                 ))}
               </select>
+
               <input
-                className="border rounded p-2"
+                className="border border-[#a243d2] rounded p-2 text-[#a243d2]"
                 name="data_despesa"
                 type="date"
                 value={form.data_despesa}
                 onChange={handleFormChange}
               />
+
               <input
-                className="border rounded p-2"
+                className="border border-[#a243d2] rounded p-2 text-[#a243d2]"
                 name="descricao"
                 placeholder="Descrição"
                 value={form.descricao}
                 onChange={handleFormChange}
               />
-              <button
-                type="submit"
-                className="bg-[#a243d2] text-white rounded px-4 py-2 font-semibold mt-2"
-              >
-                Salvar
-              </button>
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded bg-gray-200 text-[#a243d2] font-semibold hover:bg-gray-300"
+                  onClick={() => setShowNewExpenseModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-[#a243d2] text-white font-semibold hover:bg-[#580581]"
+                >
+                  Salvar
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
-      {/* Modal Visualizar Despesa */}
+
       {showViewModal && viewRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
-          <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg border-2 border-[#a243d2] relative">
+          <div 
+            ref={viewModalRef}
+            className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg border-2 border-[#a243d2] relative"
+          >
             <button
-              className="absolute top-2 right-4 text-2xl text-[#a243d2] font-bold"
+              className="absolute top-4 right-4 text-2xl text-[#a243d2] font-bold"
               onClick={() => setShowViewModal(false)}
             >
               ×
@@ -705,40 +851,24 @@ const ExpensesPage = () => {
                   ([key]) =>
                     !key.toLowerCase().includes("id") &&
                     key !== "id" &&
-                    key !== "valor" && // Remover campo de valor bruto
-                    key !== "data_despesa" // Remover campo de data original
+                    key !== "valor" &&
+                    key !== "data_despesa"
                 )
-                .map(([key, value]) => {
-                  // Formatar a data para dia/mês/ano
-                  if (key === "Data") {
-                    return (
-                      <div
-                        key={key}
-                        className="flex justify-between py-1 border-b border-gray-100"
-                      >
-                        <span className="font-semibold text-[#a243d2]">
-                          {key}:
-                        </span>
-                        <span className="text-gray-700">
-                          {new Date(viewRow.data_despesa).toLocaleDateString(
-                            "pt-BR"
-                          )}
-                        </span>
-                      </div>
-                    );
-                  }
-                  return (
-                    <div
-                      key={key}
-                      className="flex justify-between py-1 border-b border-gray-100"
-                    >
-                      <span className="font-semibold text-[#a243d2]">
-                        {key}:
-                      </span>
-                      <span className="text-gray-700">{String(value)}</span>
-                    </div>
-                  );
-                })}
+                .map(([key, value]) => (
+                  <div
+                    key={key}
+                    className="flex justify-between py-2 border-b border-gray-200"
+                  >
+                    <span className="font-semibold text-[#a243d2]">{key}:</span>
+                    <span className="text-gray-700">
+                      {key === "Valor"
+                        ? `R$ ${Number(viewRow.valor).toLocaleString("pt-BR", {
+                            minimumFractionDigits: 2,
+                          })}`
+                        : value}
+                    </span>
+                  </div>
+                ))}
             </div>
           </div>
         </div>
