@@ -5,10 +5,13 @@ import SalesPage from "../view/SalesPage";
 import ExpensesPage from "../view/ExpensesPage";
 import ReportsPage from "../view/ReportsPage";
 import SettingsPage from "../view/SettingsPage";
+import useMobileDetect from "../hooks/useMobileDetect";
 
 const ContentWrapper = () => {
+  const isMobile = useMobileDetect();
+  
   return (
-    <div className="flex-1 overflow-auto relative z-0 ml-[88px]">
+    <div className={`flex-1 overflow-auto relative z-0 ${isMobile ? "mb-16" : "ml-[88px]"}`}>
       <Routes>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/sales" element={<SalesPage />} />

@@ -1,40 +1,31 @@
 {
   "usuarios": [
     {
-      "id": "1",
       "nome": "Admin",
       "email": "admin@gmail.com",
       "senha": "admin",
       "papel": "admin",
       "data_criacao": "2025-05-01T12:00:00Z",
-      "data_atualizacao": "2025-06-24T14:25:41.912Z"
+      "data_atualizacao": "2025-06-24T14:25:41.912Z",
+      "id": "aPTmjhe"
     },
     {
-      "id": "2",
       "nome": "Yuri",
-      "email": "yuri@gmail.com",
-      "senha": "1234",
+      "email": "yuri@example.com",
+      "senha": "yuri",
       "papel": "admin",
-      "data_criacao": "2025-05-02T10:00:00Z",
-      "data_atualizacao": "2025-06-23T17:43:47.235Z"
+      "data_atualizacao": "2025-07-18T17:46:56.757Z",
+      "data_criacao": "2025-07-18T17:46:56.757Z",
+      "id": "oUKfjke"
     },
     {
-      "id": "3",
       "nome": "Fernando",
-      "email": "fernando@gmail.com",
-      "senha": "fernando123",
+      "email": "fernando@example.com",
+      "senha": "fernando",
       "papel": "user",
-      "data_criacao": "2025-05-03T09:15:00Z",
-      "data_atualizacao": "2025-06-24T14:24:54.071Z"
-    },
-    {
-      "nome": "Raphael",
-      "email": "Raphael@132.com",
-      "senha": "1234",
-      "papel": "user",
-      "data_atualizacao": "2025-07-17T13:30:37.957Z",
-      "data_criacao": "2025-07-17T13:30:37.957Z",
-      "id": "kZvrkEU"
+      "data_atualizacao": "2025-07-18T17:49:13.998Z",
+      "data_criacao": "2025-07-18T17:49:13.998Z",
+      "id": "MppOgR0"
     }
   ],
   "clientes": [
@@ -720,8 +711,8 @@
       },
       {
         "chartId": "2",
-        "x": 777,
-        "y": 1,
+        "x": 776,
+        "y": 0,
         "width": 350,
         "height": 396
       },

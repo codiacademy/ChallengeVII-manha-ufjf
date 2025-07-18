@@ -30,7 +30,7 @@ const API_BASE_URL = "http://localhost:3001";
 
 const ReportsPage = () => {
   const { user } = useAuth();
-  const isAdmin = user?.papel === 'admin';
+  const isAdmin = user?.papel === "admin";
   const [showChartModal, setShowChartModal] = useState(false);
   const [charts, setCharts] = useState([]);
   const [activeChart, setActiveChart] = useState(null);
@@ -167,7 +167,9 @@ const ReportsPage = () => {
       if (editingChart && editingChart.id) {
         setCharts((prevCharts) =>
           prevCharts.map((chart) =>
-            chart.id.toString() === editingChart.id.toString() ? savedChart : chart
+            chart.id.toString() === editingChart.id.toString()
+              ? savedChart
+              : chart
           )
         );
       } else {
@@ -462,8 +464,9 @@ const ReportsPage = () => {
     Título: chart.title,
     Tipo: chart.type.charAt(0).toUpperCase() + chart.type.slice(1),
     Campos: isDefaultChart(chart.id) ? " " : chart.dataKeys.join(", "),
-    Fonte:
-      isDefaultChart(chart.id) ? " " : availableTables.find((t) => t.id === chart.dataSource)?.name || "N/A",
+    Fonte: isDefaultChart(chart.id)
+      ? " "
+      : availableTables.find((t) => t.id === chart.dataSource)?.name || "N/A",
     "Criado em": isDefaultChart(chart.id) ? " " : formatDate(chart.dateCreated),
     Dimensões: `${chart.width} × ${chart.height}`,
     Gráfico: isDefaultChart(chart.id) ? "Padrão" : "Personalizado",
@@ -484,17 +487,17 @@ const ReportsPage = () => {
     const isDefault = isDefaultChart(chartId);
 
     return (
-      <div className="flex justify-center space-x-2">
+      <div className="flex justify-center gap-1 sm:gap-2">
         <button
           onClick={() => handleViewChart(chartId)}
-          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+          className="p-1 sm:p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
           title="Visualizar"
         >
-          <Eye size={18} />
+          <Eye size={16} className="sm:size-[18px]" />
         </button>
         <button
           onClick={() => !isDefault && handleEditChart(chartId)}
-          className={`p-1.5 ${
+          className={`p-1 sm:p-1.5 ${
             isDefault
               ? "text-gray-400 cursor-not-allowed"
               : "text-[#a243d2] hover:bg-purple-50"
@@ -502,20 +505,20 @@ const ReportsPage = () => {
           title={isDefault ? "Gráfico padrão - não editável" : "Editar"}
           disabled={isDefault}
         >
-          <PenLine size={18} />
+          <PenLine size={16} className="sm:size-[18px]" />
         </button>
         {isAdmin && (
           <button
             onClick={() => handleShareToDashboard(chartId)}
-            className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+            className="p-1 sm:p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
             title="Fixar Dashboard"
           >
-            <Pin size={18} />
+            <Pin size={16} className="sm:size-[18px]" />
           </button>
         )}
         <button
           onClick={() => !isDefault && handleDeleteChart(chartId)}
-          className={`p-1.5 ${
+          className={`p-1 sm:p-1.5 ${
             isDefault
               ? "text-gray-400 cursor-not-allowed"
               : "text-red-600 hover:bg-red-50"
@@ -523,44 +526,51 @@ const ReportsPage = () => {
           title={isDefault ? "Gráfico padrão - não removível" : "Excluir"}
           disabled={isDefault}
         >
-          <Trash2 size={18} />
+          <Trash2 size={16} className="sm:size-[18px]" />
         </button>
       </div>
     );
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50">
+    <div className="p-2 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-[#a243d2]">Relatórios</h2>
-              <p className="text-[#a243d2]">Crie e gerencie gráficos personalizados para análise de dados</p>
-            </div>
+        <div className="flex flex-col gap-4 mb-4 sm:mb-6 sm:flex-row sm:justify-between sm:items-center">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#a243d2]">
+              Relatórios
+            </h2>
+            <p className="text-sm sm:text-base text-[#a243d2]">
+              Crie e gerencie gráficos personalizados para análise de dados
+            </p>
+          </div>
           <Buttons
-            className="flex items-center gap-2 rounded-full px-4 py-2 text-white bg-[#a243d2] hover:bg-[#8a36b5]"
+            className="flex items-center gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-white bg-[#a243d2] hover:bg-[#8a36b5]"
             onClick={() => {
               resetChartState();
               setShowCustomizeModal(true);
             }}
           >
-            <SquarePlus size={18} />
+            <SquarePlus size={16} className="sm:size-[18px]" />
             <span>Novo Gráfico</span>
           </Buttons>
         </div>
 
         <div className="bg-white rounded-xl shadow p-6">
           {charts.length === 0 ? (
-            <div className="text-center p-8 text-gray-500">
+            <div className="text-center p-4 sm:p-8 text-gray-500">
               Nenhum gráfico criado ainda. Clique em "Novo Gráfico" para
               começar.
             </div>
           ) : (
-            <Table
-              data={tableData}
-              columns={tableColumns}
-              renderActions={renderActions}
-            />
+            <div className="overflow-x-auto">
+              <Table
+                data={tableData}
+                columns={tableColumns}
+                renderActions={renderActions}
+                className="min-w-full"
+              />
+            </div>
           )}
         </div>
       </div>
