@@ -92,11 +92,61 @@ const SalesPage = () => {
   const [filiais, setFiliais] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [tiposPagamento, setTiposPagamento] = useState([]);
+  const [editDesconto, setEditDesconto] = useState(0);
+  const [editComissao, setEditComissao] = useState(0);
+  const [editTaxaCartao, setEditTaxaCartao] = useState(0);
 
   // Filtro
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedField, setSelectedField] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+
+  const calcularValorTotal = (
+    cursoPreco,
+    desconto,
+    comissao,
+    tipoPagamentoId
+  ) => {
+    const preco = Number(cursoPreco) || 0;
+    const desc = Number(desconto) || 0;
+    const com = Number(comissao) || 0;
+    const valorLiquido = preco - desc;
+    const impostos = valorLiquido * 0.08;
+    const taxaCartao = tipoPagamentoId === "1" ? valorLiquido * 0.03 : 0;
+    const custoComissao = com;
+    const total = valorLiquido - impostos - taxaCartao - custoComissao;
+    return Math.max(0, total);
+  };
+
+  const [detailedValues, setDetailedValues] = useState({
+    baseValue: 0,
+    discount: 0,
+    commission: 0,
+    taxes: 0,
+    cardFee: 0,
+    total: 0,
+  });
+
+  const calculateDetailedValues = (venda) => {
+    const cursoSelecionado = cursos.find((c) => c.id === venda.cursoId);
+    const baseValue = cursoSelecionado?.preco || venda.valorTotal;
+    const discount = Number(venda.desconto) || 0;
+    const commission = Number(venda.comissao) || 0;
+
+    const valorLiquido = baseValue - discount;
+    const taxes = valorLiquido * 0.08;
+    const cardFee = venda.tipoPagamentoId === "1" ? valorLiquido * 0.03 : 0;
+    const total = valorLiquido - taxes - cardFee - commission;
+
+    return {
+      baseValue,
+      discount,
+      commission,
+      taxes,
+      cardFee,
+      total: Math.max(0, total), // Garante que não fique negativo
+    };
+  };
 
   // Modal Nova Venda fecha ao clicar fora
   useEffect(() => {
@@ -162,6 +212,8 @@ const SalesPage = () => {
         setFiliais(filiaisData);
         setVendedores(vendedoresData);
         setTiposPagamento(tiposPagamentoData);
+        // Add this right after your fetch call in the main useEffect
+        console.log("Raw vendas data:", vendas);
 
         const vendasEnriquecidas = vendas.map((venda) => ({
           id: venda.id,
@@ -175,9 +227,15 @@ const SalesPage = () => {
           Modalidade:
             modalidadesData.find((m) => m.id === venda.modalidadeId)?.tipo ||
             venda.modalidadeId,
-          Valor: `R$ ${Number(venda.valorTotal).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}`,
+          Valor: venda.valorTotal
+            ? `R$ ${Number(venda.valorTotal).toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`
+            : "R$ 0,00",
+          desconto: Number(venda.desconto) || 0,
+          comissao: Number(venda.comissao) || 0,
+          valorTotal: Number(venda.valorTotal) || 0,
           Filial:
             filiaisData.find((f) => f.id === venda.filialId)?.nome ||
             venda.filialId,
@@ -221,8 +279,6 @@ const SalesPage = () => {
   const [form, setForm] = useState({
     clienteId: "",
     cursoId: "",
-    modalidadeId: "",
-    valorTotal: "",
     filialId: "",
     vendedorId: "",
     tipoPagamentoId: "",
@@ -230,16 +286,57 @@ const SalesPage = () => {
     data_venda: "",
   });
 
+  useEffect(() => {
+    if (form.cursoId) {
+      const cursoSelecionado = cursos.find((c) => c.id === form.cursoId);
+      if (cursoSelecionado) {
+        const valorTotal = calcularValorTotal(
+          cursoSelecionado.preco,
+          form.desconto || 0,
+          form.comissao || 0,
+          form.tipoPagamentoId
+        );
+        setForm((prev) => ({
+          ...prev,
+          valorTotal: valorTotal,
+          modalidadeId: cursoSelecionado.modalidadeId,
+        }));
+      }
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        valorTotal: "",
+        modalidadeId: "",
+      }));
+    }
+  }, [form.cursoId, form.desconto, form.tipoPagamentoId, cursos]);
+
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleNewSaleSubmit = async (e) => {
     e.preventDefault();
+    const cursoSelecionado = cursos.find((c) => c.id === form.cursoId);
+    const valorTotal = calcularValorTotal(
+      cursoSelecionado?.preco || 0,
+      form.desconto || 0,
+      form.comissao || 0,
+      form.tipoPagamentoId
+    );
+    if (isNaN(form.desconto) || isNaN(form.comissao)) {
+      alert(
+        "Por favor, insira valores numéricos válidos para desconto e comissão"
+      );
+      return;
+    }
+
     const novaVenda = {
       ...form,
       id: getNextId(data),
-      valorTotal: Number(form.valorTotal),
+      valorTotal: Number(valorTotal),
+      desconto: Number(form.desconto || 0),
+      comissao: Number(form.comissao || 0),
       data_venda: form.data_venda || new Date().toISOString(),
     };
     await fetch("http://localhost:3001/vendas", {
@@ -328,6 +425,8 @@ const SalesPage = () => {
     setSelectedRow(row);
     setEditValor(row.valorTotal);
     setEditStatus(row.statusId);
+    setEditDesconto(row.desconto || 0);
+    setEditComissao(row.comissao || 0);
     setShowEditForm(true);
   };
 
@@ -335,10 +434,22 @@ const SalesPage = () => {
     const vendaOriginal = vendasOriginais.find((v) => v.id === selectedRow.id);
     if (!vendaOriginal) return;
 
+    const cursoSelecionado = cursos.find((c) => c.id === selectedRow.cursoId);
+    const valorTotal = calcularValorTotal(
+      cursoSelecionado?.preco || selectedRow.valorTotal,
+      editDesconto,
+      editComissao,
+      selectedRow.tipoPagamentoId
+    );
+
+    console.log("Saving edit with valorTotal:", valorTotal);
+
     const vendaAtualizada = {
       ...vendaOriginal,
-      valorTotal: Number(editValor),
+      valorTotal: Number(valorTotal),
       statusId: editStatus,
+      desconto: Number(editDesconto),
+      comissao: Number(editComissao),
       modalidadeId: selectedRow.modalidadeId,
       tipoPagamentoId: selectedRow.tipoPagamentoId,
       vendedorId: selectedRow.vendedorId,
@@ -476,6 +587,7 @@ const SalesPage = () => {
                   title="Visualizar"
                   onClick={() => {
                     setViewRow(row);
+                    setDetailedValues(calculateDetailedValues(row));
                     setShowViewModal(true);
                   }}
                 >
@@ -563,9 +675,27 @@ const SalesPage = () => {
                 </label>
                 <select
                   value={selectedRow.cursoId || ""}
-                  onChange={(e) =>
-                    setSelectedRow({ ...selectedRow, cursoId: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const novoCursoId = e.target.value;
+                    const cursoSelecionado = cursos.find(
+                      (c) => c.id === novoCursoId
+                    );
+                    setSelectedRow((prev) => ({
+                      ...prev,
+                      cursoId: novoCursoId,
+                      modalidadeId: cursoSelecionado
+                        ? cursoSelecionado.modalidadeId
+                        : prev.modalidadeId,
+                      valorTotal: cursoSelecionado
+                        ? cursoSelecionado.preco
+                        : prev.valorTotal,
+                    }));
+                    setEditValor(
+                      cursoSelecionado
+                        ? cursoSelecionado.preco
+                        : prev.valorTotal
+                    );
+                  }}
                   className="border border-[#a243d2] p-1 w-full rounded"
                 >
                   <option value="">Selecione</option>
@@ -576,39 +706,31 @@ const SalesPage = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Exibição da Modalidade (somente leitura) */}
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Modalidade:
                 </label>
-                <select
-                  value={selectedRow.modalidadeId || ""}
-                  onChange={(e) =>
-                    setSelectedRow({
-                      ...selectedRow,
-                      modalidadeId: e.target.value,
-                    })
-                  }
-                  className="border border-[#a243d2] p-1 w-full rounded"
-                >
-                  <option value="">Selecione</option>
-                  {modalidades.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.tipo}
-                    </option>
-                  ))}
-                </select>
+                <div className="border border-[#a243d2] p-1 w-full rounded bg-gray-100">
+                  {modalidades.find((m) => m.id === selectedRow.modalidadeId)
+                    ?.tipo || "Modalidade não definida"}
+                </div>
               </div>
+
+              {/* Exibição do Valor (somente leitura) */}
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
                   Valor:
                 </label>
-                <input
-                  type="number"
-                  value={editValor}
-                  onChange={(e) => setEditValor(e.target.value)}
-                  className="border border-[#a243d2] p-1 w-full rounded"
-                  required
-                />
+                <div className="border border-[#a243d2] p-1 w-full rounded bg-gray-100">
+                  R${" "}
+                  {selectedRow.valorTotal
+                    ? Number(selectedRow.valorTotal).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })
+                    : "0,00"}
+                </div>
               </div>
               <div>
                 <label className="block text-sm text-[#a243d2] mb-1">
@@ -767,29 +889,58 @@ const SalesPage = () => {
                   </option>
                 ))}
               </select>
-              <select
-                name="modalidadeId"
-                value={form.modalidadeId}
-                onChange={handleFormChange}
-                className="border rounded p-2"
-                required
-              >
-                <option value="">Selecione a Modalidade</option>
-                {modalidades.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.tipo}
-                  </option>
-                ))}
-              </select>
-              <input
-                className="border rounded p-2"
-                name="valorTotal"
-                placeholder="Valor"
-                type="number"
-                value={form.valorTotal}
-                onChange={handleFormChange}
-                required
-              />
+              <div className="border rounded p-2 bg-gray-100">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Modalidade:
+                </label>
+                <div className="text-lg font-semibold">
+                  {form.modalidadeId
+                    ? modalidades.find((m) => m.id === form.modalidadeId)
+                        ?.tipo || "Modalidade não encontrada"
+                    : "Selecione um curso"}
+                </div>
+              </div>
+              {/* Campo de desconto CORRIGIDO */}
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Desconto (R$):
+                </label>
+                <input
+                  type="number"
+                  name="desconto"
+                  value={form.desconto || 0}
+                  onChange={handleFormChange}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                />
+              </div>
+
+              {/* Campo de comissão CORRIGIDO */}
+              <div>
+                <label className="block text-sm text-[#a243d2] mb-1">
+                  Comissão (R$):
+                </label>
+                <input
+                  type="number"
+                  name="comissao"
+                  value={form.comissao || 0}
+                  onChange={handleFormChange}
+                  className="border border-[#a243d2] p-1 w-full rounded"
+                />
+              </div>
+
+              {/* Exibição do valor calculado */}
+              <div className="border rounded p-2 bg-gray-100">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Valor Total:
+                </label>
+                <div className="text-lg font-semibold">
+                  {form.valorTotal
+                    ? `R$ ${Number(form.valorTotal).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })}`
+                    : "Selecione um curso"}
+                </div>
+              </div>
               <select
                 name="filialId"
                 value={form.filialId}
@@ -869,19 +1020,104 @@ const SalesPage = () => {
               Detalhes da Venda
             </h3>
             <div className="flex flex-col gap-2">
-              {Object.entries(viewRow)
-                .filter(
-                  ([key]) => !key.toLowerCase().includes("id") && key !== "id"
-                ) // Filtra apenas campos de ID
-                .map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex justify-between py-1 border-b border-gray-100"
-                  >
-                    <span className="font-semibold text-[#a243d2]">{key}:</span>
-                    <span className="text-gray-700">{String(value)}</span>
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Data:</span>
+                <span className="text-gray-700">{viewRow.Data}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Cliente:</span>
+                <span className="text-gray-700">{viewRow.Cliente}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Curso:</span>
+                <span className="text-gray-700">{viewRow.Curso}</span>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Valor do Curso:</span>
+                  <span>
+                    R$ {detailedValues.baseValue.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-red-500">
+                  <span>Desconto:</span>
+                  <span>
+                    - R$ {detailedValues.discount.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+
+                <div className="border-b pb-2">
+                  <div className="flex justify-between font-medium">
+                    <span>Saldo:</span>
+                    <span>
+                      R${" "}
+                      {(
+                        detailedValues.baseValue - detailedValues.discount
+                      ).toLocaleString("pt-BR")}
+                    </span>
                   </div>
-                ))}
+                </div>
+
+                <div className="flex justify-between text-red-500">
+                  <span>Impostos (8%):</span>
+                  <span>
+                    - R$ {detailedValues.taxes.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+
+                {detailedValues.cardFee > 0 && (
+                  <div className="flex justify-between text-red-500">
+                    <span>Taxa do Cartão (3%):</span>
+                    <span>
+                      - R$ {detailedValues.cardFee.toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-red-500">
+                  <span>Comissão:</span>
+                  <span>
+                    - R$ {detailedValues.commission.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+
+                <div className="border-t pt-2 font-bold">
+                  <div className="flex justify-between">
+                    <span>Valor Final:</span>
+                    <span>
+                      R${" "}
+                      {detailedValues.total.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Filial:</span>
+                <span className="text-gray-700">{viewRow.Filial}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Vendedor:</span>
+                <span className="text-gray-700">{viewRow.Vendedor}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Pagamento:</span>
+                <span className="text-gray-700">{viewRow.Pagamento}</span>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="font-semibold text-[#a243d2]">Status:</span>
+                <span className="text-gray-700">{viewRow.Status}</span>
+              </div>
             </div>
           </div>
         </div>

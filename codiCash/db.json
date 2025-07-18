@@ -289,16 +289,14 @@
       "statusId": "1",
       "filialId": "1",
       "modalidadeId": "1",
-      "valorBruto": 2700,
       "desconto": 0,
-      "impostos": 100,
+      "impostos": 0.08,
       "comissao": 150,
-      "taxaCartao": 50,
-      "parcelas": 1,
-      "valorTotal": 2600,
+      "taxaCartao": 0.03,
       "data_venda": "2025-05-01T12:00:00Z",
       "data_criacao": "2025-05-01T12:00:00Z",
-      "data_atualizacao": "2025-05-01T12:00:00Z"
+      "data_atualizacao": "2025-05-01T12:00:00Z",
+      "valorTotal": 2253
     },
     {
       "id": "2",
@@ -309,16 +307,14 @@
       "statusId": "1",
       "filialId": "2",
       "modalidadeId": "2",
-      "valorBruto": 3200,
       "desconto": 200,
-      "impostos": 120,
+      "impostos": 0.08,
       "comissao": 180,
       "taxaCartao": 0,
-      "parcelas": 3,
-      "valorTotal": 2900,
       "data_venda": "2025-05-05T14:30:00Z",
       "data_criacao": "2025-05-05T14:30:00Z",
-      "data_atualizacao": "2025-05-10T10:15:00Z"
+      "data_atualizacao": "2025-05-10T10:15:00Z",
+      "valorTotal": 2580
     },
     {
       "id": "3",
@@ -329,16 +325,14 @@
       "statusId": "2",
       "filialId": "3",
       "modalidadeId": "1",
-      "valorBruto": 2300,
       "desconto": 150,
-      "impostos": 90,
+      "impostos": 0.08,
       "comissao": 130,
       "taxaCartao": 40,
-      "parcelas": 2,
-      "valorTotal": 2060,
       "data_venda": "2025-05-10T11:45:00Z",
       "data_criacao": "2025-05-10T11:45:00Z",
-      "data_atualizacao": "2025-05-15T16:20:00Z"
+      "data_atualizacao": "2025-05-15T16:20:00Z",
+      "valorTotal": 1783.5
     },
     {
       "id": "4",
@@ -349,16 +343,14 @@
       "statusId": "3",
       "filialId": "1",
       "modalidadeId": "2",
-      "valorBruto": 1800,
       "desconto": 0,
-      "impostos": 70,
+      "impostos": 0.08,
       "comissao": 100,
       "taxaCartao": 0,
-      "parcelas": 1,
-      "valorTotal": 1730,
       "data_venda": "2025-05-15T16:20:00Z",
       "data_criacao": "2025-05-15T16:20:00Z",
-      "data_atualizacao": "2025-05-20T14:30:00Z"
+      "data_atualizacao": "2025-05-20T14:30:00Z",
+      "valorTotal": 1556
     },
     {
       "id": "5",
@@ -369,16 +361,14 @@
       "statusId": "1",
       "filialId": "1",
       "modalidadeId": "1",
-      "valorBruto": 2700,
       "desconto": 300,
-      "impostos": 100,
+      "impostos": 0.08,
       "comissao": 150,
       "taxaCartao": 0,
-      "parcelas": 1,
-      "valorTotal": 2300,
       "data_venda": "2025-05-20T10:15:00Z",
       "data_criacao": "2025-05-20T10:15:00Z",
-      "data_atualizacao": "2025-05-25T11:30:00Z"
+      "data_atualizacao": "2025-05-25T11:30:00Z",
+      "valorTotal": 2058
     }
   ],
   "pagamentos": [
