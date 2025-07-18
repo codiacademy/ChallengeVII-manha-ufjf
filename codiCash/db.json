@@ -304,7 +304,8 @@
       "taxaCartao": 0.03,
       "data_venda": "2025-05-01T12:00:00Z",
       "data_criacao": "2025-05-01T12:00:00Z",
-      "data_atualizacao": "2025-05-01T12:00:00Z"
+      "data_atualizacao": "2025-05-01T12:00:00Z",
+      "valorTotal": 2253
     },
     {
       "id": "2",
@@ -321,7 +322,8 @@
       "taxaCartao": 0,
       "data_venda": "2025-05-05T14:30:00Z",
       "data_criacao": "2025-05-05T14:30:00Z",
-      "data_atualizacao": "2025-05-10T10:15:00Z"
+      "data_atualizacao": "2025-05-10T10:15:00Z",
+      "valorTotal": 2580
     },
     {
       "id": "3",
@@ -338,7 +340,8 @@
       "taxaCartao": 40,
       "data_venda": "2025-05-10T11:45:00Z",
       "data_criacao": "2025-05-10T11:45:00Z",
-      "data_atualizacao": "2025-05-15T16:20:00Z"
+      "data_atualizacao": "2025-05-15T16:20:00Z",
+      "valorTotal": 1783.5
     },
     {
       "id": "4",
@@ -355,7 +358,8 @@
       "taxaCartao": 0,
       "data_venda": "2025-05-15T16:20:00Z",
       "data_criacao": "2025-05-15T16:20:00Z",
-      "data_atualizacao": "2025-05-20T14:30:00Z"
+      "data_atualizacao": "2025-05-20T14:30:00Z",
+      "valorTotal": 1556
     },
     {
       "id": "5",
@@ -372,7 +376,8 @@
       "taxaCartao": 0,
       "data_venda": "2025-05-20T10:15:00Z",
       "data_criacao": "2025-05-20T10:15:00Z",
-      "data_atualizacao": "2025-05-25T11:30:00Z"
+      "data_atualizacao": "2025-05-25T11:30:00Z",
+      "valorTotal": 2058
     }
   ],
   "pagamentos": [

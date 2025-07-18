@@ -107,10 +107,45 @@ const SalesPage = () => {
     comissao,
     tipoPagamentoId
   ) => {
-    const valorBase = cursoPreco - desconto + comissao;
-    const impostos = valorBase * 0.08;
-    const taxaCartao = tipoPagamentoId === "1" ? valorBase * 0.03 : 0;
-    return valorBase + impostos + taxaCartao;
+    const preco = Number(cursoPreco) || 0;
+    const desc = Number(desconto) || 0;
+    const com = Number(comissao) || 0;
+    const valorLiquido = preco - desc;
+    const impostos = valorLiquido * 0.08;
+    const taxaCartao = tipoPagamentoId === "1" ? valorLiquido * 0.03 : 0;
+    const custoComissao = com;
+    const total = valorLiquido - impostos - taxaCartao - custoComissao;
+    return Math.max(0, total);
+  };
+
+  const [detailedValues, setDetailedValues] = useState({
+    baseValue: 0,
+    discount: 0,
+    commission: 0,
+    taxes: 0,
+    cardFee: 0,
+    total: 0,
+  });
+
+  const calculateDetailedValues = (venda) => {
+    const cursoSelecionado = cursos.find((c) => c.id === venda.cursoId);
+    const baseValue = cursoSelecionado?.preco || venda.valorTotal;
+    const discount = Number(venda.desconto) || 0;
+    const commission = Number(venda.comissao) || 0;
+
+    const valorLiquido = baseValue - discount;
+    const taxes = valorLiquido * 0.08;
+    const cardFee = venda.tipoPagamentoId === "1" ? valorLiquido * 0.03 : 0;
+    const total = valorLiquido - taxes - cardFee - commission;
+
+    return {
+      baseValue,
+      discount,
+      commission,
+      taxes,
+      cardFee,
+      total: Math.max(0, total), // Garante que não fique negativo
+    };
   };
 
   // Modal Nova Venda fecha ao clicar fora
@@ -177,6 +212,8 @@ const SalesPage = () => {
         setFiliais(filiaisData);
         setVendedores(vendedoresData);
         setTiposPagamento(tiposPagamentoData);
+        // Add this right after your fetch call in the main useEffect
+        console.log("Raw vendas data:", vendas);
 
         const vendasEnriquecidas = vendas.map((venda) => ({
           id: venda.id,
@@ -190,9 +227,15 @@ const SalesPage = () => {
           Modalidade:
             modalidadesData.find((m) => m.id === venda.modalidadeId)?.tipo ||
             venda.modalidadeId,
-          Valor: `R$ ${Number(venda.valorTotal).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}`,
+          Valor: venda.valorTotal
+            ? `R$ ${Number(venda.valorTotal).toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`
+            : "R$ 0,00",
+          desconto: Number(venda.desconto) || 0,
+          comissao: Number(venda.comissao) || 0,
+          valorTotal: Number(venda.valorTotal) || 0,
           Filial:
             filiaisData.find((f) => f.id === venda.filialId)?.nome ||
             venda.filialId,
@@ -276,11 +319,17 @@ const SalesPage = () => {
     e.preventDefault();
     const cursoSelecionado = cursos.find((c) => c.id === form.cursoId);
     const valorTotal = calcularValorTotal(
-      cursoSelecionado?.preco || selectedRow.valorTotal,
-      editDesconto,
-      editComissao,
-      selectedRow.tipoPagamentoId
+      cursoSelecionado?.preco || 0,
+      form.desconto || 0,
+      form.comissao || 0,
+      form.tipoPagamentoId
     );
+    if (isNaN(form.desconto) || isNaN(form.comissao)) {
+      alert(
+        "Por favor, insira valores numéricos válidos para desconto e comissão"
+      );
+      return;
+    }
 
     const novaVenda = {
       ...form,
@@ -389,8 +438,11 @@ const SalesPage = () => {
     const valorTotal = calcularValorTotal(
       cursoSelecionado?.preco || selectedRow.valorTotal,
       editDesconto,
+      editComissao,
       selectedRow.tipoPagamentoId
     );
+
+    console.log("Saving edit with valorTotal:", valorTotal);
 
     const vendaAtualizada = {
       ...vendaOriginal,
@@ -535,6 +587,7 @@ const SalesPage = () => {
                   title="Visualizar"
                   onClick={() => {
                     setViewRow(row);
+                    setDetailedValues(calculateDetailedValues(row));
                     setShowViewModal(true);
                   }}
                 >
@@ -967,7 +1020,6 @@ const SalesPage = () => {
               Detalhes da Venda
             </h3>
             <div className="flex flex-col gap-2">
-              {/* Adicionar campos específicos */}
               <div className="flex justify-between py-1 border-b border-gray-100">
                 <span className="font-semibold text-[#a243d2]">Data:</span>
                 <span className="text-gray-700">{viewRow.Data}</span>
@@ -983,33 +1035,68 @@ const SalesPage = () => {
                 <span className="text-gray-700">{viewRow.Curso}</span>
               </div>
 
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="font-semibold text-[#a243d2]">Valor:</span>
-                <span className="text-gray-700">{viewRow.Valor}</span>
-              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Valor do Curso:</span>
+                  <span>
+                    R$ {detailedValues.baseValue.toLocaleString("pt-BR")}
+                  </span>
+                </div>
 
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="font-semibold text-[#a243d2]">Desconto:</span>
-                <span className="text-gray-700">
-                  R${" "}
-                  {viewRow.desconto
-                    ? Number(viewRow.desconto).toLocaleString("pt-BR", {
-                        minimumFractionDigits: 2,
-                      })
-                    : "0,00"}
-                </span>
-              </div>
+                <div className="flex justify-between text-red-500">
+                  <span>Desconto:</span>
+                  <span>
+                    - R$ {detailedValues.discount.toLocaleString("pt-BR")}
+                  </span>
+                </div>
 
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="font-semibold text-[#a243d2]">Comissão:</span>
-                <span className="text-gray-700">
-                  R${" "}
-                  {viewRow.comissao
-                    ? Number(viewRow.comissao).toLocaleString("pt-BR", {
+                <div className="border-b pb-2">
+                  <div className="flex justify-between font-medium">
+                    <span>Saldo:</span>
+                    <span>
+                      R${" "}
+                      {(
+                        detailedValues.baseValue - detailedValues.discount
+                      ).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between text-red-500">
+                  <span>Impostos (8%):</span>
+                  <span>
+                    - R$ {detailedValues.taxes.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+
+                {detailedValues.cardFee > 0 && (
+                  <div className="flex justify-between text-red-500">
+                    <span>Taxa do Cartão (3%):</span>
+                    <span>
+                      - R$ {detailedValues.cardFee.toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-red-500">
+                  <span>Comissão:</span>
+                  <span>
+                    - R$ {detailedValues.commission.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+
+                <div className="border-t pt-2 font-bold">
+                  <div className="flex justify-between">
+                    <span>Valor Final:</span>
+                    <span>
+                      R${" "}
+                      {detailedValues.total.toLocaleString("pt-BR", {
                         minimumFractionDigits: 2,
-                      })
-                    : "0,00"}
-                </span>
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-between py-1 border-b border-gray-100">
