@@ -73,39 +73,174 @@
   "cursos": [
     {
       "id": "1",
-      "nome": "Full Stack",
-      "descricao": "Curso de Desenvolvimento Web Completo",
-      "preco": 2700,
+      "nome": "Inteligência Artificial Aplicada",
+      "descricao": "Curso de Inteligência Artificial Aplicada",
+      "preco": 2500,
       "modalidadeId": "1",
-      "data_criacao": "2025-05-01T12:00:00Z",
-      "data_atualizacao": "2025-05-01T12:00:00Z"
+      "data_criacao": "2025-05-20T10:00:00Z",
+      "data_atualizacao": "2025-05-20T10:00:00Z"
     },
     {
       "id": "2",
-      "nome": "Data Science",
-      "descricao": "Curso de Análise de Dados e Machine Learning",
-      "preco": 3200,
-      "modalidadeId": "2",
-      "data_criacao": "2025-05-05T09:00:00Z",
-      "data_atualizacao": "2025-05-10T14:30:00Z"
+      "nome": "Desenvolvimento Web Frontend",
+      "descricao": "Curso de Desenvolvimento Web Frontend",
+      "preco": 1800,
+      "modalidadeId": "1",
+      "data_criacao": "2025-05-21T09:00:00Z",
+      "data_atualizacao": "2025-05-21T09:00:00Z"
     },
     {
       "id": "3",
-      "nome": "UX/UI Design",
-      "descricao": "Curso de Design de Interface e Experiência do Usuário",
-      "preco": 2300,
+      "nome": "Desenvolvedor Web Fullstack",
+      "descricao": "Curso de Desenvolvedor Web Fullstack",
+      "preco": 2600,
       "modalidadeId": "1",
-      "data_criacao": "2025-05-10T14:00:00Z",
-      "data_atualizacao": "2025-05-15T11:45:00Z"
+      "data_criacao": "2025-05-22T11:00:00Z",
+      "data_atualizacao": "2025-05-22T11:00:00Z"
     },
     {
       "id": "4",
-      "nome": "Marketing Digital",
-      "descricao": "Curso de Estratégias de Marketing Online",
+      "nome": "Curso de Lógica de Programação com Égua",
+      "descricao": "Curso de Lógica de Programação com Égua",
+      "preco": 97,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-23T14:00:00Z",
+      "data_atualizacao": "2025-05-23T14:00:00Z"
+    },
+    {
+      "id": "5",
+      "nome": "Desenvolvimento Web com PHP",
+      "descricao": "Curso de Desenvolvimento Web com PHP",
+      "preco": 147,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-24T10:30:00Z",
+      "data_atualizacao": "2025-05-24T10:30:00Z"
+    },
+    {
+      "id": "6",
+      "nome": "Curso Preparatório AWS Certified Cloud Practitioner (CLF-C02)",
+      "descricao": "Curso Preparatório AWS Certified Cloud Practitioner (CLF-C02)",
+      "preco": 147,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-25T13:00:00Z",
+      "data_atualizacao": "2025-05-25T13:00:00Z"
+    },
+    {
+      "id": "7",
+      "nome": "Código Limpo: Programe como Sênior",
+      "descricao": "Curso de Programação Avançada e Boas Práticas",
+      "preco": 150,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-26T15:00:00Z",
+      "data_atualizacao": "2025-05-26T15:00:00Z"
+    },
+    {
+      "id": "8",
+      "nome": "Desenvolvedor Web Fullstack",
+      "descricao": "Curso de Desenvolvedor Web Fullstack (Online)",
       "preco": 1800,
       "modalidadeId": "2",
-      "data_criacao": "2025-05-15T10:30:00Z",
-      "data_atualizacao": "2025-05-20T16:20:00Z"
+      "data_criacao": "2025-05-27T09:30:00Z",
+      "data_atualizacao": "2025-05-27T09:30:00Z"
+    },
+    {
+      "id": "9",
+      "nome": "Curso Completo de Autocad",
+      "descricao": "Curso Completo de Autocad",
+      "preco": 400,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-28T11:00:00Z",
+      "data_atualizacao": "2025-05-28T11:00:00Z"
+    },
+    {
+      "id": "10",
+      "nome": "Fundamentos Git & GitHub",
+      "descricao": "Curso de Fundamentos Git & GitHub",
+      "preco": 160,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-29T14:00:00Z",
+      "data_atualizacao": "2025-05-29T14:00:00Z"
+    },
+    {
+      "id": "11",
+      "nome": "Crie uma rotina para estudar e trabalhar",
+      "descricao": "Curso de Produtividade e Organização",
+      "preco": 97,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-30T10:00:00Z",
+      "data_atualizacao": "2025-05-30T10:00:00Z"
+    },
+    {
+      "id": "12",
+      "nome": "Intensivão Frontend: HTML + CSS + JS",
+      "descricao": "Curso Intensivo de Frontend",
+      "preco": 97,
+      "modalidadeId": "2",
+      "data_criacao": "2025-06-01T09:00:00Z",
+      "data_atualizacao": "2025-06-01T09:00:00Z"
+    },
+    {
+      "id": "13",
+      "nome": "Curso de JavaScript: Avançado",
+      "descricao": "Curso Avançado de JavaScript",
+      "preco": 297,
+      "modalidadeId": "2",
+      "data_criacao": "2025-06-02T11:00:00Z",
+      "data_atualizacao": "2025-06-02T11:00:00Z"
+    },
+    {
+      "id": "14",
+      "nome": "Fundamentos do Desenvolvimento Web com HTML, CSS e JS",
+      "descricao": "Curso de Fundamentos Web",
+      "preco": 750,
+      "modalidadeId": "2",
+      "data_criacao": "2025-06-03T13:00:00Z",
+      "data_atualizacao": "2025-06-03T13:00:00Z"
+    },
+    {
+      "id": "15",
+      "nome": "Desenvolvimento Web Backend",
+      "descricao": "Curso de Desenvolvimento Web Backend",
+      "preco": 1800,
+      "modalidadeId": "2",
+      "data_criacao": "2025-06-04T10:00:00Z",
+      "data_atualizacao": "2025-06-04T10:00:00Z"
+    },
+    {
+      "id": "16",
+      "nome": "Bootcamp Magic | Fullstack Com Contratação",
+      "descricao": "Bootcamp Fullstack com Garantia de Contratação",
+      "preco": 3600,
+      "modalidadeId": "1",
+      "data_criacao": "2025-06-05T09:00:00Z",
+      "data_atualizacao": "2025-06-05T09:00:00Z"
+    },
+    {
+      "id": "17",
+      "nome": "Programador Data Science",
+      "descricao": "Curso de Programação para Data Science",
+      "preco": 2700,
+      "modalidadeId": "1",
+      "data_criacao": "2025-06-06T11:00:00Z",
+      "data_atualizacao": "2025-06-06T11:00:00Z"
+    },
+    {
+      "id": "18",
+      "nome": "LinkedIn para Devs: Atraia Recrutadores",
+      "descricao": "Curso de Otimização de LinkedIn para Desenvolvedores",
+      "preco": 147,
+      "modalidadeId": "2",
+      "data_criacao": "2025-06-07T14:00:00Z",
+      "data_atualizacao": "2025-06-07T14:00:00Z"
+    },
+    {
+      "id": "19",
+      "nome": "Inglês para Programadores",
+      "descricao": "Curso de Inglês Técnico para Programadores",
+      "preco": 800,
+      "modalidadeId": "2",
+      "data_criacao": "2025-06-08T10:30:00Z",
+      "data_atualizacao": "2025-06-08T10:30:00Z"
     }
   ],
   "modalidades": [
@@ -158,9 +293,9 @@
       "localizacao": "Bairro Alto"
     },
     {
+      "id": "3",
       "nome": "Moinho Zona Norte",
       "localizacao": "Moinho Zona Norte",
-      "id": 4,
       "data_atualizacao": "2025-07-19T01:58:08.500Z",
       "data_criacao": "2025-07-19T01:58:08.500Z"
     }
