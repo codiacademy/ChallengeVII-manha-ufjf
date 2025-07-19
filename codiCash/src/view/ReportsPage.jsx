@@ -25,6 +25,7 @@ import ChartCustomizer from "../components/ChartCustomizer";
 import ChartPreview from "../components/ChartPreview";
 import Table from "../components/Table";
 import { useAuth } from "../context/AuthContext";
+import SummaryCard from "../components/SummaryCard";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -46,17 +47,17 @@ const ReportsPage = () => {
     {
       id: "vendas",
       name: "Vendas",
-      icon: <ShoppingBag size={20} className="text-[#a243d2]" />,
+      icon: ShoppingBag,
     },
     {
       id: "despesas",
       name: "Despesas",
-      icon: <Wallet size={20} className="text-[#a243d2]" />,
+      icon: Wallet,
     },
     {
       id: "pagamentos",
       name: "Pagamentos",
-      icon: <CreditCard size={20} className="text-[#a243d2]" />,
+      icon: CreditCard,
     },
   ];
 
@@ -487,17 +488,17 @@ const ReportsPage = () => {
     const isDefault = isDefaultChart(chartId);
 
     return (
-      <div className="flex justify-center gap-1 sm:gap-2">
+      <div className="flex justify-center items-center gap-3 mx-2">
         <button
           onClick={() => handleViewChart(chartId)}
-          className="p-1 sm:p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
           title="Visualizar"
         >
-          <Eye size={16} className="sm:size-[18px]" />
+          <Eye size={18} />
         </button>
         <button
           onClick={() => !isDefault && handleEditChart(chartId)}
-          className={`p-1 sm:p-1.5 ${
+          className={`p-1.5 ${
             isDefault
               ? "text-gray-400 cursor-not-allowed"
               : "text-[#a243d2] hover:bg-purple-50"
@@ -505,20 +506,20 @@ const ReportsPage = () => {
           title={isDefault ? "Gráfico padrão - não editável" : "Editar"}
           disabled={isDefault}
         >
-          <PenLine size={16} className="sm:size-[18px]" />
+          <PenLine size={18} />
         </button>
         {isAdmin && (
           <button
             onClick={() => handleShareToDashboard(chartId)}
-            className="p-1 sm:p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+            className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
             title="Fixar Dashboard"
           >
-            <Pin size={16} className="sm:size-[18px]" />
+            <Pin size={18} />
           </button>
         )}
         <button
           onClick={() => !isDefault && handleDeleteChart(chartId)}
-          className={`p-1 sm:p-1.5 ${
+          className={`p-1.5 ${
             isDefault
               ? "text-gray-400 cursor-not-allowed"
               : "text-red-600 hover:bg-red-50"
@@ -526,51 +527,48 @@ const ReportsPage = () => {
           title={isDefault ? "Gráfico padrão - não removível" : "Excluir"}
           disabled={isDefault}
         >
-          <Trash2 size={16} className="sm:size-[18px]" />
+          <Trash2 size={18} />
         </button>
       </div>
     );
   };
 
   return (
-    <div className="p-2 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col gap-4 mb-4 sm:mb-6 sm:flex-row sm:justify-between sm:items-center">
+    <div className="p-0 min-h-screen bg-[#f3f8fc] flex flex-col items-center">
+      <div className="w-full max-w-5xl flex flex-col items-center px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full mb-6 gap-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#a243d2]">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#a243d2] mt-6 mb-1">
               Relatórios
             </h2>
-            <p className="text-sm sm:text-base text-[#a243d2]">
+            <p className="text-[#a243d2] text-sm sm:text-base">
               Crie e gerencie gráficos personalizados para análise de dados
             </p>
           </div>
           <Buttons
-            className="flex items-center gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-white bg-[#a243d2] hover:bg-[#8a36b5]"
+            className="flex flex-row items-center gap-2 rounded-lg px-4 py-2 border border-[#a243d2] bg-[#a243d2] text-white font-semibold shadow-sm mt-0 sm:mt-6 w-full sm:w-auto justify-center"
             onClick={() => {
               resetChartState();
               setShowCustomizeModal(true);
             }}
           >
-            <SquarePlus size={16} className="sm:size-[18px]" />
+            <SquarePlus size={18} />
             <span>Novo Gráfico</span>
           </Buttons>
         </div>
 
-        <div className="bg-white rounded-xl shadow p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-0 w-full border-2 border-[#a243d2] overflow-x-auto">
           {charts.length === 0 ? (
-            <div className="text-center p-4 sm:p-8 text-gray-500">
+            <div className="text-center p-8 text-gray-500">
               Nenhum gráfico criado ainda. Clique em "Novo Gráfico" para
               começar.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table
-                data={tableData}
-                columns={tableColumns}
-                renderActions={renderActions}
-                className="min-w-full"
-              />
-            </div>
+            <Table
+              data={tableData}
+              columns={tableColumns}
+              renderActions={renderActions}
+            />
           )}
         </div>
       </div>
@@ -638,22 +636,23 @@ const ReportsPage = () => {
               Selecione a fonte de dados
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {availableTables.map((table) => (
-                <button
-                  key={table.id}
-                  onClick={() => fetchAvailableData(table.id)}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-[#a243d2] hover:bg-purple-50 transition-colors flex flex-col items-center"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#a243d2] bg-opacity-10 flex items-center justify-center mb-2">
-                    {table.icon || (
-                      <Database size={20} className="text-[#a243d2]" />
-                    )}
-                  </div>
-                  <span className="text-gray-800 text-center">
-                    {table.name}
-                  </span>
-                </button>
-              ))}
+              {availableTables.map((table) => {
+                const Icon = table.icon || Database;
+                return (
+                  <button
+                    key={table.id}
+                    onClick={() => fetchAvailableData(table.id)}
+                    className="p-4 border border-gray-200 rounded-lg hover:border-[#a243d2] hover:bg-purple-50 transition-colors flex flex-col items-center"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#a243d2] bg-opacity-10 flex items-center justify-center mb-2">
+                      <Icon size={20} className="text-white" />
+                    </div>
+                    <span className="text-gray-800 text-center">
+                      {table.name}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         ) : (

@@ -158,9 +158,11 @@
       "localizacao": "Bairro Alto"
     },
     {
-      "id": "3",
-      "nome": "Jardim Botânico",
-      "localizacao": "Zona Sul"
+      "nome": "Moinho Zona Norte",
+      "localizacao": "Moinho Zona Norte",
+      "id": 4,
+      "data_atualizacao": "2025-07-19T01:58:08.500Z",
+      "data_criacao": "2025-07-19T01:58:08.500Z"
     }
   ],
   "vendedores": [
@@ -701,7 +703,7 @@
       },
       {
         "chartId": "2",
-        "x": 776,
+        "x": 779,
         "y": 0,
         "width": 350,
         "height": 396

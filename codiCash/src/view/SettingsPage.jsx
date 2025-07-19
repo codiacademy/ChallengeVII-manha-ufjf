@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import Buttons from "../components/Buttons";
 import Modal from "../components/Modal";
@@ -99,32 +99,32 @@ const SettingsPage = () => {
     fetchAllData();
   }, [user, navigate]);
 
-  const fetchAllData = () => {
+  const fetchAllData = useCallback(() => {
     fetchUsers();
     fetchVendedores();
     fetchFiliais();
     fetchClientes();
     fetchCursos();
     fetchModalidades();
-  };
+  }, []);
 
   // Funções genéricas
-  const getNextId = (array) => {
+  const getNextId = useCallback((array) => {
     if (!array || array.length === 0) return "1";
     const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
     return String(maxId + 1);
-  };
+  }, []);
 
-  const toggleModal = (modalName, isOpen, item = null) => {
+  const toggleModal = useCallback((modalName, isOpen, item = null) => {
     setModals(prev => ({ ...prev, [modalName]: isOpen }));
     if (item) {
       setCurrentItems(prev => ({ ...prev, [modalName]: item }));
     } else if (!isOpen) {
       setCurrentItems(prev => ({ ...prev, [modalName]: null }));
     }
-  };
+  }, []);
 
-  const handleFormChange = (formName, e) => {
+  const handleFormChange = useCallback((formName, e) => {
     const { name, value } = e.target;
     setForms(prev => ({
       ...prev,
@@ -133,10 +133,10 @@ const SettingsPage = () => {
         [name]: value
       }
     }));
-  };
+  }, []);
 
   // Funções de busca
-  const fetchData = async (endpoint, setState) => {
+  const fetchData = useCallback(async (endpoint, setState) => {
     try {
       const response = await fetch(`http://localhost:3001/${endpoint}`);
       const data = await response.json();
@@ -144,28 +144,28 @@ const SettingsPage = () => {
     } catch (error) {
       console.error(`Error fetching ${endpoint}:`, error);
     }
-  };
+  }, []);
 
-  const fetchUsers = () => fetchData("usuarios", setUsers);
-  const fetchVendedores = () => fetchData("vendedores", setVendedores);
-  const fetchFiliais = () => fetchData("filiais", setFiliais);
-  const fetchModalidades = () => fetchData("modalidades", setModalidades);
-  const fetchClientes = () => fetchData("clientes", setClientes);
-  const fetchCursos = () => fetchData("cursos", setCursos);
+  const fetchUsers = useCallback(() => fetchData("usuarios", setUsers), [fetchData]);
+  const fetchVendedores = useCallback(() => fetchData("vendedores", setVendedores), [fetchData]);
+  const fetchFiliais = useCallback(() => fetchData("filiais", setFiliais), [fetchData]);
+  const fetchModalidades = useCallback(() => fetchData("modalidades", setModalidades), [fetchData]);
+  const fetchClientes = useCallback(() => fetchData("clientes", setClientes), [fetchData]);
+  const fetchCursos = useCallback(() => fetchData("cursos", setCursos), [fetchData]);
 
   // Funções auxiliares
-  const getFilialName = (filialId) => {
+  const getFilialName = useCallback((filialId) => {
     const filial = filiais.find((f) => f.id === filialId);
     return filial ? `${filial.nome} - ${filial.localizacao}` : "N/A";
-  };
+  }, [filiais]);
 
-  const getModalidadeName = (modalidadeId) => {
+  const getModalidadeName = useCallback((modalidadeId) => {
     const modalidade = modalidades.find((m) => m.id === modalidadeId);
     return modalidade ? modalidade.tipo : "N/A";
-  };
+  }, [modalidades]);
 
   // Handlers genéricos para CRUD
-  const handleSubmit = async (e, endpoint, formName, currentItemName, successMessage) => {
+  const handleSubmit = useCallback(async (e, endpoint, formName, currentItemName, successMessage) => {
     e.preventDefault();
     const currentItem = currentItems[currentItemName];
     const formData = forms[formName];
@@ -195,16 +195,19 @@ const SettingsPage = () => {
       toast.success(currentItem ? `${successMessage} atualizado!` : `${successMessage} criado!`);
       fetchData(endpoint, eval(`set${endpoint.charAt(0).toUpperCase() + endpoint.slice(1)}`));
       toggleModal(formName, false);
-      setForms(prev => ({ ...prev, [formName]: Object.fromEntries(
-        Object.keys(prev[formName]).map(key => [key, key === 'papel' ? 'user' : ''])
-      )}));
+      setForms(prev => ({ 
+        ...prev, 
+        [formName]: Object.fromEntries(
+          Object.keys(prev[formName]).map(key => [key, key === 'papel' ? 'user' : ''])
+        )
+      }));
     } catch (error) {
       toast.error(`Erro ao salvar ${successMessage}`);
       console.error("Error:", error);
     }
-  };
+  }, [currentItems, forms, getNextId, fetchData, toggleModal]);
 
-  const handleEdit = (item, formName, modalName) => {
+  const handleEdit = useCallback((item, formName, modalName) => {
     if ((formName === 'user' || modalName === 'user') && !isAdmin) {
       toast.error("Apenas administradores podem editar usuários");
       return;
@@ -218,9 +221,9 @@ const SettingsPage = () => {
       )
     }));
     toggleModal(modalName, true, item);
-  };
+  }, [isAdmin, toggleModal]);
 
-  const handleDelete = async (id, endpoint, successMessage, checkAdmin = false, isSelf = false) => {
+  const handleDelete = useCallback(async (id, endpoint, successMessage, checkAdmin = false, isSelf = false) => {
     if (checkAdmin && !isAdmin) {
       toast.error("Apenas administradores podem realizar esta ação");
       return;
@@ -241,10 +244,10 @@ const SettingsPage = () => {
         console.error("Error:", error);
       }
     }
-  };
+  }, [isAdmin, fetchData]);
 
   // Handlers específicos
-  const handleUpdateProfile = async (e) => {
+  const handleUpdateProfile = useCallback(async (e) => {
     e.preventDefault();
     const { novaSenha, confirmarSenha, senhaAtual, ...profileData } = forms.profile;
 
@@ -287,10 +290,10 @@ const SettingsPage = () => {
       toast.error("Erro ao atualizar perfil");
       console.error("Error:", error);
     }
-  };
+  }, [forms.profile, user?.id]);
 
   // Componentes reutilizáveis
-  const FormInput = ({ label, name, value, onChange, type = "text", required = true, placeholder = "", ...props }) => (
+  const FormInput = memo(({ label, name, value, onChange, type = "text", required = true, placeholder = "", ...props }) => (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       <input
@@ -304,9 +307,9 @@ const SettingsPage = () => {
         {...props}
       />
     </div>
-  );
+  ));
 
-  const FormSelect = ({ label, name, value, onChange, options, required = true }) => (
+  const FormSelect = memo(({ label, name, value, onChange, options, required = true }) => (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       <select
@@ -324,9 +327,9 @@ const SettingsPage = () => {
         ))}
       </select>
     </div>
-  );
+  ));
 
-  const FormButtons = ({ onCancel, onSubmitText }) => (
+  const FormButtons = memo(({ onCancel, onSubmitText }) => (
     <div className="flex justify-end gap-2">
       <button
         type="button"
@@ -339,9 +342,9 @@ const SettingsPage = () => {
         {onSubmitText}
       </Buttons>
     </div>
-  );
+  ));
 
-  const DataTable = ({ data, columns, onEdit, onDelete }) => (
+  const DataTable = memo(({ data, columns, onEdit, onDelete }) => (
     <div className="bg-white rounded-lg shadow overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
@@ -381,9 +384,9 @@ const SettingsPage = () => {
         </tbody>
       </table>
     </div>
-  );
+  ));
 
-  const SectionHeader = ({ title, onAdd }) => (
+  const SectionHeader = memo(({ title, onAdd }) => (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
       <h2 className="text-lg sm:text-xl font-semibold">{title}</h2>
       {onAdd && (
@@ -392,10 +395,10 @@ const SettingsPage = () => {
         </Buttons>
       )}
     </div>
-  );
+  ));
 
   // Modals reutilizáveis
-  const ClientModal = () => (
+  const ClientModal = memo(() => (
     <Modal
       isOpen={modals.client}
       onClose={() => toggleModal("client", false)}
@@ -415,9 +418,9 @@ const SettingsPage = () => {
         />
       </form>
     </Modal>
-  );
+  ));
 
-  const CursoModal = () => (
+  const CursoModal = memo(() => (
     <Modal
       isOpen={modals.curso}
       onClose={() => toggleModal("curso", false)}
@@ -460,9 +463,9 @@ const SettingsPage = () => {
         />
       </form>
     </Modal>
-  );
+  ));
 
-  const FilialModal = () => (
+  const FilialModal = memo(() => (
     <Modal
       isOpen={modals.filial}
       onClose={() => toggleModal("filial", false)}
@@ -481,9 +484,9 @@ const SettingsPage = () => {
         />
       </form>
     </Modal>
-  );
+  ));
 
-  const UserModal = () => (
+  const UserModal = memo(() => (
     <Modal
       isOpen={modals.user}
       onClose={() => toggleModal("user", false)}
@@ -521,9 +524,9 @@ const SettingsPage = () => {
         />
       </form>
     </Modal>
-  );
+  ));
 
-  const VendedorModal = () => (
+  const VendedorModal = memo(() => (
     <Modal
       isOpen={modals.vendedor}
       onClose={() => toggleModal("vendedor", false)}
@@ -548,7 +551,7 @@ const SettingsPage = () => {
         />
       </form>
     </Modal>
-  );
+  ));
 
   // Tabs
   const tabs = [

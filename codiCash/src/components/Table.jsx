@@ -12,31 +12,43 @@ const Table = ({ data, columns, renderActions }) => {
       <tbody>
         {data.map((row, rowIndex) => (
           <tr key={rowIndex}>
-            {columns.map((column, colIndex) => (
+            {columns.map((column, colIndex) => {
+              const baseClasses = "inline-block px-2 py-[1px] rounded-full text-white font-semibold text-sm leading-tight"; // <- aqui está o segredo
+              let cellClass = "text-center";
+
+              if (column === "Modalidade") {
+                cellClass =
+                  row[column] === "Presencial"
+                    ? `${baseClasses} bg-[#a243d2]`
+                    : `${baseClasses} bg-emerald-600`;
+              } else if (column === "Pagamento") {
+                cellClass =
+                  row[column] === "PIX"
+                    ? `${baseClasses} bg-emerald-500`
+                    : `${baseClasses} bg-blue-700`;
+              } else if (column === "Status") {
+                cellClass =
+                  row[column] === "Pago"
+                    ? `${baseClasses} bg-emerald-500`
+                    : row[column] === "Pendente"
+                    ? `${baseClasses} bg-orange-400`
+                    : `${baseClasses} bg-gray-400`;
+              }
+
+              return (
+                <td key={colIndex}>
+                  <span className={cellClass}>{row[column]}</span>
+                </td>
+              );
+            })}
+            {renderActions && (
               <td
-                key={colIndex}
-                className={
-                  column === "Modalidade"
-                    ? row[column] === "Presencial"
-                       ? "px-1.5 py-0.5 rounded-full bg-[#a243d2] text-white font-semibold text-sm"
-                       : "px-1.5 py-0.5 rounded-full bg-emerald-600 text-white font-semibold text-sm"
-                    : column === "Pagamento"
-                    ? row[column] === "PIX"
-                       ? "px-1.5 py-0.5 rounded-full bg-emerald-500 text-white font-semibold text-sm"
-                       : "px-1.5 py-0.5 rounded-full bg-blue-700 text-white font-semibold text-sm"
-                    : column === "Status"
-                    ? row[column] === "Pago"
-                       ? "px-1.5 py-0.5 rounded-full bg-emerald-500 text-white font-semibold text-sm"
-                       : row[column] === "Pendente"
-                       ? "px-1.5 py-0.5 rounded-full bg-orange-400 text-white font-semibold text-sm"
-                       : "px-1.5 py-0.5 rounded-full bg-gray-400 text-white font-semibold text-sm"
-                    : "text-center"
-                }
+                className="px-4 py-2 text-center align-middle"
+                style={{ minWidth: 160 }}
               >
-                {row[column]}
+                {renderActions(row)}
               </td>
-            ))}
-                {renderActions && <td className="px-4 py-2 text-center align-middle" style={{ minWidth: 160 }}>{renderActions(row)}</td>}
+            )}
           </tr>
         ))}
       </tbody>
