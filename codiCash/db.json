@@ -1,0 +1,727 @@
+{
+  "usuarios": [
+    {
+      "nome": "Admin",
+      "email": "admin@gmail.com",
+      "senha": "admin",
+      "papel": "admin",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-06-24T14:25:41.912Z",
+      "id": "aPTmjhe"
+    },
+    {
+      "nome": "Yuri",
+      "email": "yuri@example.com",
+      "senha": "yuri",
+      "papel": "admin",
+      "data_atualizacao": "2025-07-18T17:46:56.757Z",
+      "data_criacao": "2025-07-18T17:46:56.757Z",
+      "id": "oUKfjke"
+    },
+    {
+      "nome": "Fernando",
+      "email": "fernando@example.com",
+      "senha": "fernando",
+      "papel": "user",
+      "data_atualizacao": "2025-07-18T17:49:13.998Z",
+      "data_criacao": "2025-07-18T17:49:13.998Z",
+      "id": "MppOgR0"
+    }
+  ],
+  "clientes": [
+    {
+      "id": "1",
+      "nome": "João Silva",
+      "email": "joao.silva@example.com",
+      "telefone": "99999-9999",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z"
+    },
+    {
+      "id": "2",
+      "nome": "Maria Oliveira",
+      "email": "maria.oliveira@example.com",
+      "telefone": "98888-8888",
+      "data_criacao": "2025-05-05T10:30:00Z",
+      "data_atualizacao": "2025-05-15T16:45:22.123Z"
+    },
+    {
+      "id": "3",
+      "nome": "Carlos Souza",
+      "email": "carlos.souza@example.com",
+      "telefone": "97777-7777",
+      "data_criacao": "2025-05-10T14:15:00Z",
+      "data_atualizacao": "2025-06-01T09:30:15.789Z"
+    },
+    {
+      "id": "4",
+      "nome": "Ana Paula",
+      "email": "ana.paula@example.com",
+      "telefone": "96666-6666",
+      "data_criacao": "2025-05-15T11:20:00Z",
+      "data_atualizacao": "2025-06-10T14:55:33.654Z"
+    },
+    {
+      "id": "5",
+      "nome": "Pedro Santos",
+      "email": "pedro.santos@example.com",
+      "telefone": "95555-5555",
+      "data_criacao": "2025-05-20T16:40:00Z",
+      "data_atualizacao": "2025-06-15T10:25:44.321Z"
+    }
+  ],
+  "cursos": [
+    {
+      "id": "1",
+      "nome": "Full Stack",
+      "descricao": "Curso de Desenvolvimento Web Completo",
+      "preco": 2700,
+      "modalidadeId": "1",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z"
+    },
+    {
+      "id": "2",
+      "nome": "Data Science",
+      "descricao": "Curso de Análise de Dados e Machine Learning",
+      "preco": 3200,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-05T09:00:00Z",
+      "data_atualizacao": "2025-05-10T14:30:00Z"
+    },
+    {
+      "id": "3",
+      "nome": "UX/UI Design",
+      "descricao": "Curso de Design de Interface e Experiência do Usuário",
+      "preco": 2300,
+      "modalidadeId": "1",
+      "data_criacao": "2025-05-10T14:00:00Z",
+      "data_atualizacao": "2025-05-15T11:45:00Z"
+    },
+    {
+      "id": "4",
+      "nome": "Marketing Digital",
+      "descricao": "Curso de Estratégias de Marketing Online",
+      "preco": 1800,
+      "modalidadeId": "2",
+      "data_criacao": "2025-05-15T10:30:00Z",
+      "data_atualizacao": "2025-05-20T16:20:00Z"
+    }
+  ],
+  "modalidades": [
+    {
+      "id": "1",
+      "tipo": "Presencial"
+    },
+    {
+      "id": "2",
+      "tipo": "Online"
+    }
+  ],
+  "status": [
+    {
+      "id": "1",
+      "nome": "Pago"
+    },
+    {
+      "id": "2",
+      "nome": "Pendente"
+    },
+    {
+      "id": "3",
+      "nome": "Cancelado"
+    }
+  ],
+  "tiposPagamento": [
+    {
+      "id": "1",
+      "nome": "Cartão"
+    },
+    {
+      "id": "2",
+      "nome": "PIX"
+    },
+    {
+      "id": "3",
+      "nome": "Boleto"
+    }
+  ],
+  "filiais": [
+    {
+      "id": "1",
+      "nome": "CRITT",
+      "localizacao": "Centro"
+    },
+    {
+      "id": "2",
+      "nome": "Rio Branco",
+      "localizacao": "Bairro Alto"
+    },
+    {
+      "nome": "Moinho Zona Norte",
+      "localizacao": "Moinho Zona Norte",
+      "id": 4,
+      "data_atualizacao": "2025-07-19T01:58:08.500Z",
+      "data_criacao": "2025-07-19T01:58:08.500Z"
+    }
+  ],
+  "vendedores": [
+    {
+      "id": "1",
+      "nome": "Clarissa",
+      "filialId": "1"
+    },
+    {
+      "id": "2",
+      "nome": "Roberto",
+      "filialId": "2"
+    },
+    {
+      "id": "3",
+      "nome": "Juliana",
+      "filialId": "3"
+    },
+    {
+      "id": "4",
+      "nome": "Marcos",
+      "filialId": "1"
+    }
+  ],
+  "tiposDespesas": [
+    {
+      "id": "1",
+      "nome": "Aluguel",
+      "categoriaId": "1"
+    },
+    {
+      "id": "2",
+      "nome": "Luz",
+      "categoriaId": "1"
+    },
+    {
+      "id": "3",
+      "nome": "Folha de Pagamento",
+      "categoriaId": "2"
+    },
+    {
+      "id": "4",
+      "nome": "Internet",
+      "categoriaId": "1"
+    },
+    {
+      "id": "5",
+      "nome": "Material de Escritório",
+      "categoriaId": "2"
+    }
+  ],
+  "categoriasDespesas": [
+    {
+      "id": "1",
+      "nome": "Fixa"
+    },
+    {
+      "id": "2",
+      "nome": "Variável"
+    }
+  ],
+  "despesas": [
+    {
+      "id": "1",
+      "tipoDespesaId": "1",
+      "filialId": "1",
+      "statusId": "1",
+      "valor": 3500,
+      "descricao": "Aluguel CRITT - Maio",
+      "data_despesa": "2025-05-01T12:00:00Z",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z"
+    },
+    {
+      "id": "2",
+      "tipoDespesaId": "2",
+      "filialId": "1",
+      "statusId": "1",
+      "valor": 450,
+      "descricao": "Energia elétrica - Maio",
+      "data_despesa": "2025-05-05T00:00:00Z",
+      "data_criacao": "2025-05-05T10:15:00Z",
+      "data_atualizacao": "2025-05-05T10:15:00Z"
+    },
+    {
+      "id": "3",
+      "tipoDespesaId": "3",
+      "filialId": "2",
+      "statusId": "1",
+      "valor": 12000,
+      "descricao": "Salários - Maio",
+      "data_despesa": "2025-05-10T00:00:00Z",
+      "data_criacao": "2025-05-10T09:30:00Z",
+      "data_atualizacao": "2025-05-10T09:30:00Z"
+    },
+    {
+      "id": "4",
+      "tipoDespesaId": "4",
+      "filialId": "3",
+      "statusId": "2",
+      "valor": 300,
+      "descricao": "Internet - Junho",
+      "data_despesa": "2025-06-01T00:00:00Z",
+      "data_criacao": "2025-05-25T14:20:00Z",
+      "data_atualizacao": "2025-05-30T11:45:00Z"
+    },
+    {
+      "id": "5",
+      "tipoDespesaId": "5",
+      "filialId": "1",
+      "statusId": "1",
+      "valor": 250,
+      "descricao": "Material de escritório",
+      "data_despesa": "2025-05-15T00:00:00Z",
+      "data_criacao": "2025-05-15T16:30:00Z",
+      "data_atualizacao": "2025-05-15T16:30:00Z"
+    }
+  ],
+  "vendas": [
+    {
+      "id": "1",
+      "clienteId": "1",
+      "cursoId": "1",
+      "vendedorId": "1",
+      "tipoPagamentoId": "1",
+      "statusId": "1",
+      "filialId": "1",
+      "modalidadeId": "1",
+      "desconto": 0,
+      "impostos": 0.08,
+      "comissao": 150,
+      "taxaCartao": 0.03,
+      "data_venda": "2025-05-01T12:00:00Z",
+      "data_criacao": "2025-05-01T12:00:00Z",
+      "data_atualizacao": "2025-05-01T12:00:00Z",
+      "valorTotal": 2253
+    },
+    {
+      "id": "2",
+      "clienteId": "2",
+      "cursoId": "2",
+      "vendedorId": "2",
+      "tipoPagamentoId": "2",
+      "statusId": "1",
+      "filialId": "2",
+      "modalidadeId": "2",
+      "desconto": 200,
+      "impostos": 0.08,
+      "comissao": 180,
+      "taxaCartao": 0,
+      "data_venda": "2025-05-05T14:30:00Z",
+      "data_criacao": "2025-05-05T14:30:00Z",
+      "data_atualizacao": "2025-05-10T10:15:00Z",
+      "valorTotal": 2580
+    },
+    {
+      "id": "3",
+      "clienteId": "3",
+      "cursoId": "3",
+      "vendedorId": "3",
+      "tipoPagamentoId": "1",
+      "statusId": "2",
+      "filialId": "3",
+      "modalidadeId": "1",
+      "desconto": 150,
+      "impostos": 0.08,
+      "comissao": 130,
+      "taxaCartao": 40,
+      "data_venda": "2025-05-10T11:45:00Z",
+      "data_criacao": "2025-05-10T11:45:00Z",
+      "data_atualizacao": "2025-05-15T16:20:00Z",
+      "valorTotal": 1783.5
+    },
+    {
+      "id": "4",
+      "clienteId": "4",
+      "cursoId": "4",
+      "vendedorId": "4",
+      "tipoPagamentoId": "3",
+      "statusId": "3",
+      "filialId": "1",
+      "modalidadeId": "2",
+      "desconto": 0,
+      "impostos": 0.08,
+      "comissao": 100,
+      "taxaCartao": 0,
+      "data_venda": "2025-05-15T16:20:00Z",
+      "data_criacao": "2025-05-15T16:20:00Z",
+      "data_atualizacao": "2025-05-20T14:30:00Z",
+      "valorTotal": 1556
+    },
+    {
+      "id": "5",
+      "clienteId": "5",
+      "cursoId": "1",
+      "vendedorId": "1",
+      "tipoPagamentoId": "2",
+      "statusId": "1",
+      "filialId": "1",
+      "modalidadeId": "1",
+      "desconto": 300,
+      "impostos": 0.08,
+      "comissao": 150,
+      "taxaCartao": 0,
+      "data_venda": "2025-05-20T10:15:00Z",
+      "data_criacao": "2025-05-20T10:15:00Z",
+      "data_atualizacao": "2025-05-25T11:30:00Z",
+      "valorTotal": 2058
+    }
+  ],
+  "pagamentos": [
+    {
+      "id": "1",
+      "vendaId": "1",
+      "tipoPagamentoId": "1",
+      "valor": 2600,
+      "data_pagamento": "2025-05-01T12:30:00Z",
+      "data_criacao": "2025-05-01T12:30:00Z",
+      "data_atualizacao": "2025-05-01T12:30:00Z"
+    },
+    {
+      "id": "2",
+      "vendaId": "2",
+      "tipoPagamentoId": "2",
+      "valor": 1000,
+      "data_pagamento": "2025-05-05T15:00:00Z",
+      "data_criacao": "2025-05-05T15:00:00Z",
+      "data_atualizacao": "2025-05-05T15:00:00Z"
+    },
+    {
+      "id": "3",
+      "vendaId": "2",
+      "tipoPagamentoId": "2",
+      "valor": 1000,
+      "data_pagamento": "2025-06-05T10:00:00Z",
+      "data_criacao": "2025-05-05T15:00:00Z",
+      "data_atualizacao": "2025-06-05T10:00:00Z"
+    },
+    {
+      "id": "4",
+      "vendaId": "5",
+      "tipoPagamentoId": "2",
+      "valor": 2300,
+      "data_pagamento": "2025-05-20T11:00:00Z",
+      "data_criacao": "2025-05-20T11:00:00Z",
+      "data_atualizacao": "2025-05-20T11:00:00Z"
+    }
+  ],
+  "graficos": [
+    {
+      "id": "1",
+      "title": "Receita vs Despesa Mensal",
+      "type": "bar",
+      "data": [
+        {
+          "mes": "Maio",
+          "receita": 10660,
+          "despesa": 16500,
+          "lucro": -5840
+        },
+        {
+          "mes": "Junho",
+          "receita": 8500,
+          "despesa": 12500,
+          "lucro": -4000
+        },
+        {
+          "mes": "Julho",
+          "receita": 15200,
+          "despesa": 14200,
+          "lucro": 1000
+        }
+      ],
+      "dataKeys": [
+        "receita",
+        "despesa"
+      ],
+      "isDefault": true,
+      "xAxisKey": "mes",
+      "width": 600,
+      "height": 400,
+      "colors": [
+        "#4CAF50",
+        "#F44336"
+      ],
+      "showLegend": true,
+      "legendPosition": "bottom",
+      "showGrid": true,
+      "showTooltip": true,
+      "dateCreated": 1752524270630,
+      "legends": {
+        "receita": "Receita",
+        "despesa": "Despesa"
+      }
+    },
+    {
+      "id": "2",
+      "title": "Distribuição de Gastos",
+      "type": "pie",
+      "data": [
+        {
+          "name": "Aluguel",
+          "value": 3500,
+          "color": "#3F51B5"
+        },
+        {
+          "name": "Salários",
+          "value": 12000,
+          "color": "#9C27B0"
+        },
+        {
+          "name": "Energia",
+          "value": 450,
+          "color": "#2196F3"
+        },
+        {
+          "name": "Internet",
+          "value": 300,
+          "color": "#00BCD4"
+        },
+        {
+          "name": "Material",
+          "value": 250,
+          "color": "#009688"
+        }
+      ],
+      "isDefault": true,
+      "dataKeys": [
+        "value"
+      ],
+      "xAxisKey": "name",
+      "width": 500,
+      "height": 400,
+      "colors": [
+        "#3F51B5",
+        "#9C27B0",
+        "#2196F3",
+        "#00BCD4",
+        "#009688"
+      ],
+      "showLegend": true,
+      "legendPosition": "right",
+      "showGrid": false,
+      "showTooltip": false,
+      "dateCreated": 1752525206651,
+      "legends": {
+        "value": "Valor"
+      }
+    },
+    {
+      "id": "3",
+      "title": "Receitas vs Despesas por Filial",
+      "type": "bar",
+      "data": [
+        {
+          "filial": "CRITT",
+          "receita": 6600,
+          "despesa": 4200,
+          "lucro": 2400
+        },
+        {
+          "filial": "Rio Branco",
+          "receita": 2900,
+          "despesa": 12000,
+          "lucro": -9100
+        },
+        {
+          "filial": "Jardim Botânico",
+          "receita": 2060,
+          "despesa": 300,
+          "lucro": 1760
+        }
+      ],
+      "isDefault": true,
+      "dataKeys": [
+        "receita",
+        "despesa"
+      ],
+      "xAxisKey": "filial",
+      "width": 600,
+      "height": 400,
+      "colors": [
+        "#4CAF50",
+        "#F44336"
+      ],
+      "showLegend": true,
+      "legendPosition": "bottom",
+      "showGrid": true,
+      "showTooltip": true,
+      "dateCreated": 1752525300000,
+      "legends": {
+        "receita": "Receita",
+        "despesa": "Despesa"
+      }
+    },
+    {
+      "id": "4",
+      "title": "Comissão vs Valor de Venda",
+      "type": "bar",
+      "data": [
+        {
+          "vendedor": "Clarissa",
+          "comissao": 300,
+          "valorVenda": 4900
+        },
+        {
+          "vendedor": "Roberto",
+          "comissao": 180,
+          "valorVenda": 2900
+        },
+        {
+          "vendedor": "Juliana",
+          "comissao": 130,
+          "valorVenda": 2060
+        },
+        {
+          "vendedor": "Marcos",
+          "comissao": 100,
+          "valorVenda": 1730
+        }
+      ],
+      "isDefault": true,
+      "dataKeys": [
+        "comissao",
+        "valorVenda"
+      ],
+      "xAxisKey": "vendedor",
+      "width": 600,
+      "height": 400,
+      "colors": [
+        "#FF9800",
+        "#795548"
+      ],
+      "showLegend": true,
+      "legendPosition": "bottom",
+      "showGrid": true,
+      "showTooltip": true,
+      "dateCreated": 1752525400000,
+      "legends": {
+        "comissao": "Comissão",
+        "valorVenda": "Valor Venda"
+      }
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "1",
+      "userId": "1",
+      "layout": [
+        {
+          "chartId": "1",
+          "x": 0,
+          "y": 0,
+          "width": 354,
+          "height": 396
+        },
+        {
+          "chartId": "2",
+          "x": 778,
+          "y": 0,
+          "width": 350,
+          "height": 396
+        },
+        {
+          "chartId": "3",
+          "x": 0,
+          "y": 420,
+          "width": 1128,
+          "height": 311
+        },
+        {
+          "chartId": "4",
+          "x": 359,
+          "y": 0,
+          "width": 414,
+          "height": 397
+        }
+      ],
+      "isDefault": false
+    },
+    {
+      "id": "2",
+      "userId": "2",
+      "layout": [
+        {
+          "chartId": "1",
+          "x": 0,
+          "y": 0,
+          "width": 400,
+          "height": 300
+        },
+        {
+          "chartId": "3",
+          "x": 420,
+          "y": 0,
+          "width": 500,
+          "height": 350
+        }
+      ],
+      "isDefault": false
+    },
+    {
+      "id": "3",
+      "userId": "3",
+      "layout": [],
+      "isDefault": false
+    },
+    {
+      "id": "4",
+      "userId": "default",
+      "layout": [
+        {
+          "chartId": "1",
+          "x": 0,
+          "y": 0,
+          "width": 400,
+          "height": 300
+        },
+        {
+          "chartId": "2",
+          "x": 420,
+          "y": 0,
+          "width": 400,
+          "height": 300
+        }
+      ],
+      "isDefault": true
+    }
+  ],
+  "dashboard": {
+    "layout": [
+      {
+        "chartId": "1",
+        "x": 0,
+        "y": 0,
+        "width": 354,
+        "height": 396
+      },
+      {
+        "chartId": "2",
+        "x": 779,
+        "y": 0,
+        "width": 350,
+        "height": 396
+      },
+      {
+        "chartId": "3",
+        "x": 0,
+        "y": 420,
+        "width": 1128,
+        "height": 311
+      },
+      {
+        "chartId": "4",
+        "x": 359,
+        "y": 0,
+        "width": 414,
+        "height": 397
+      }
+    ]
+  }
+}
