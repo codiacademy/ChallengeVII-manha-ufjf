@@ -100,7 +100,6 @@ const ExpenseModal = ({ title, onClose, children, buttons }) => (
 );
 
 const ExpensesPage = () => {
-  // State hooks
   const [data, setData] = useState([]);
   const [columns] = useState([
     "Data",
@@ -138,11 +137,9 @@ const ExpensesPage = () => {
     descricao: "",
   });
 
-  // Refs
   const modalRef = useRef();
   const viewModalRef = useRef();
 
-  // Calculated values
   const totalFixa = data
     .filter((item) => item.Categoria === "Fixa")
     .reduce((sum, item) => sum + (item.valor || 0), 0);
@@ -153,7 +150,6 @@ const ExpensesPage = () => {
 
   const totalGeral = totalFixa + totalVariavel;
 
-  // Helper functions
   const formatCurrency = (value) =>
     new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -187,7 +183,6 @@ const ExpensesPage = () => {
     setFilteredData(result);
   }, [data, activeCategory, dateRange]);
 
-  // API calls
   useEffect(() => {
     fetch("http://localhost:3001/status")
       .then((res) => res.json())
@@ -259,7 +254,6 @@ const ExpensesPage = () => {
     filterData();
   }, [filterData]);
 
-  // Event handlers
   const handleEdit = useCallback(
     (row) => {
       setSelectedRow(row);
@@ -380,7 +374,6 @@ const ExpensesPage = () => {
     setData((prev) => [...prev, novaDespesaFormatada]);
   };
 
-  // Summary cards data
   const summaryCards = [
     {
       title: "Total Fixas",

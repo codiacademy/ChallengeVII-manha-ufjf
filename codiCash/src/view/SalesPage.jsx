@@ -113,7 +113,6 @@ const SalesPage = () => {
   const [statusMap, setStatusMap] = useState({});
   const [vendasOriginais, setVendasOriginais] = useState([]);
 
-  // Form states
   const [form, setForm] = useState({
     clienteId: "",
     cursoId: "",
@@ -126,7 +125,6 @@ const SalesPage = () => {
     comissao: 0,
   });
 
-  // Dropdown data
   const [clientes, setClientes] = useState([]);
   const [cursos, setCursos] = useState([]);
   const [modalidades, setModalidades] = useState([]);
@@ -134,7 +132,6 @@ const SalesPage = () => {
   const [vendedores, setVendedores] = useState([]);
   const [tiposPagamento, setTiposPagamento] = useState([]);
 
-  // UI states
   const [showPopover, setShowPopover] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showNewSaleModal, setShowNewSaleModal] = useState(false);
@@ -142,11 +139,9 @@ const SalesPage = () => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedField, setSelectedField] = useState("");
 
-  // Refs
   const popoverRef = useRef();
   const modalRef = useRef();
 
-  // Calculate totals
   const totalVendas = data.reduce(
     (sum, item) => sum + (item.valorTotal || 0),
     0
@@ -197,7 +192,6 @@ const SalesPage = () => {
     []
   );
 
-  // Fetch all data
   useEffect(() => {
     const fetchData = async () => {
       const [
@@ -277,7 +271,6 @@ const SalesPage = () => {
     fetchData();
   }, []);
 
-  // Handle outside clicks for modals
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -301,7 +294,6 @@ const SalesPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNewSaleModal, showEditForm]);
 
-  // Calculate value when course changes
   useEffect(() => {
     if (!form.cursoId) return;
 

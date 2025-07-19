@@ -10,16 +10,14 @@ const SettingsPage = () => {
   const { user, logout } = useAuth();
   const isAdmin = user?.papel === 'admin';
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem("settingsActiveTab") || "profile");
-  
-  // Estados para dados
+
   const [users, setUsers] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [filiais, setFiliais] = useState([]);
   const [modalidades, setModalidades] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [cursos, setCursos] = useState([]);
-  
-  // Estados para modais
+
   const [modals, setModals] = useState({
     user: false,
     vendedor: false,
@@ -27,8 +25,7 @@ const SettingsPage = () => {
     curso: false,
     filial: false
   });
-  
-  // Estados para itens atuais
+
   const [currentItems, setCurrentItems] = useState({
     user: null,
     vendedor: null,
@@ -36,8 +33,7 @@ const SettingsPage = () => {
     curso: null,
     filial: null
   });
-  
-  // Estados para formulários
+
   const [forms, setForms] = useState({
     profile: {
       nome: user?.nome || "",
@@ -73,19 +69,16 @@ const SettingsPage = () => {
     }
   });
 
-  // Persistir aba ativa
   useEffect(() => {
     localStorage.setItem("settingsActiveTab", activeTab);
   }, [activeTab]);
 
-  // Redirecionar se não estiver logado
   useEffect(() => {
     if (!user) {
       navigate("/");
       return;
     }
 
-    // Atualizar formulário de perfil com dados do usuário
     setForms(prev => ({
       ...prev,
       profile: {
@@ -95,7 +88,6 @@ const SettingsPage = () => {
       }
     }));
 
-    // Carregar todos os dados necessários
     fetchAllData();
   }, [user, navigate]);
 
@@ -108,7 +100,6 @@ const SettingsPage = () => {
     fetchModalidades();
   }, []);
 
-  // Funções genéricas
   const getNextId = useCallback((array) => {
     if (!array || array.length === 0) return "1";
     const maxId = Math.max(...array.map((item) => Number(item.id) || 0));
@@ -135,7 +126,6 @@ const SettingsPage = () => {
     }));
   }, []);
 
-  // Funções de busca
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
       const response = await fetch(`http://localhost:3001/${endpoint}`);
@@ -153,7 +143,6 @@ const SettingsPage = () => {
   const fetchClientes = useCallback(() => fetchData("clientes", setClientes), [fetchData]);
   const fetchCursos = useCallback(() => fetchData("cursos", setCursos), [fetchData]);
 
-  // Funções auxiliares
   const getFilialName = useCallback((filialId) => {
     const filial = filiais.find((f) => f.id === filialId);
     return filial ? `${filial.nome} - ${filial.localizacao}` : "N/A";
@@ -164,7 +153,6 @@ const SettingsPage = () => {
     return modalidade ? modalidade.tipo : "N/A";
   }, [modalidades]);
 
-  // Handlers genéricos para CRUD
   const handleSubmit = useCallback(async (e, endpoint, formName, currentItemName, successMessage) => {
     e.preventDefault();
     const currentItem = currentItems[currentItemName];
@@ -246,7 +234,6 @@ const SettingsPage = () => {
     }
   }, [isAdmin, fetchData]);
 
-  // Handlers específicos
   const handleUpdateProfile = useCallback(async (e) => {
     e.preventDefault();
     const { novaSenha, confirmarSenha, senhaAtual, ...profileData } = forms.profile;
@@ -292,7 +279,6 @@ const SettingsPage = () => {
     }
   }, [forms.profile, user?.id]);
 
-  // Componentes reutilizáveis
   const FormInput = memo(({ label, name, value, onChange, type = "text", required = true, placeholder = "", ...props }) => (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
@@ -397,7 +383,6 @@ const SettingsPage = () => {
     </div>
   ));
 
-  // Modals reutilizáveis
   const ClientModal = memo(() => (
     <Modal
       isOpen={modals.client}
@@ -553,7 +538,6 @@ const SettingsPage = () => {
     </Modal>
   ));
 
-  // Tabs
   const tabs = [
     { id: "profile", label: "Meu Perfil" },
     ...(isAdmin ? [{ id: "users", label: "Usuários" }] : []),
